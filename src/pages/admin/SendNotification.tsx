@@ -110,6 +110,18 @@ const SendNotification = () => {
     }
   };
 
+  const handleDeleteOne = async (id: string) => {
+    try {
+      await supabase.from('user_notifications').delete().eq('notification_id', id);
+      const { error } = await supabase.from('notifications').delete().eq('id', id);
+      if (error) throw error;
+      setSentNotifications(prev => prev.filter(n => n.id !== id));
+      toast.success('Notification deleted');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-foreground">Send Notification</h1>
@@ -188,11 +200,18 @@ const SendNotification = () => {
             <div className="space-y-3">
               {sentNotifications.map(n => (
                 <div key={n.id} className="p-3 rounded-lg bg-muted/50 border border-border/30">
-                  <p className="font-medium text-sm">{n.title}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{n.message}</p>
-                  <p className="text-[10px] text-muted-foreground/60 mt-1">
-                    {format(new Date(n.created_at), 'MMM dd, yyyy hh:mm a')}
-                  </p>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-sm">{n.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{n.message}</p>
+                      <p className="text-[10px] text-muted-foreground/60 mt-1">
+                        {format(new Date(n.created_at), 'MMM dd, yyyy hh:mm a')}
+                      </p>
+                    </div>
+                    <button onClick={() => handleDeleteOne(n.id)} className="text-muted-foreground hover:text-destructive transition-colors p-1 rounded hover:bg-destructive/10 shrink-0">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
