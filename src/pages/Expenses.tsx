@@ -38,9 +38,8 @@ const Expenses = () => {
 
   const getUserName = (id: string) => users.find((u) => u.id === id)?.fullName || 'Unknown';
 
-  const handleDelete = (id: string) => {
-    deleteExpense(id);
-    toast.success('Expense deleted.');
+  const confirmDelete = () => {
+    if (deleteId) { deleteExpense(deleteId); toast.success('Expense deleted.'); setDeleteId(null); }
   };
 
   const openEdit = (e: Expense) => {
