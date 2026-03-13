@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, UserCheck, Users, ShieldCheck, Activity, Settings, LogOut
+  LayoutDashboard, UserCheck, Users, ShieldCheck, Activity, Settings, LogOut, Bell
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useAppStore } from '@/store/useAppStore';
@@ -17,6 +17,7 @@ const menuItems = [
   { title: 'User Management', url: '/admin/users', icon: Users },
   { title: 'Roles & Permissions', url: '/admin/roles', icon: ShieldCheck },
   { title: 'System Activity', url: '/admin/activity', icon: Activity },
+  { title: 'Notifications', url: '/admin/notifications', icon: Bell },
   { title: 'Settings', url: '/admin/settings', icon: Settings },
 ];
 

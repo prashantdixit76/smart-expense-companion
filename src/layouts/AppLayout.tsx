@@ -6,6 +6,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { InstallButton } from '@/components/InstallButton';
 import { Loader2, Wallet } from 'lucide-react';
+import { NotificationBell } from '@/components/NotificationBell';
 
 const AppLayout = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -37,6 +38,7 @@ const AppLayout = () => {
               <h2 className="text-base font-bold text-foreground truncate">Smart Expense Tracker</h2>
             </div>
             <div className="flex items-center gap-2">
+              <NotificationBell />
               <InstallButton />
               <ThemeToggle />
             </div>

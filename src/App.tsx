@@ -24,6 +24,7 @@ import UserManagement from "@/pages/admin/UserManagement";
 import RolesPermissions from "@/pages/admin/RolesPermissions";
 import SystemActivity from "@/pages/admin/SystemActivity";
 import AdminSettings from "@/pages/admin/AdminSettings";
+import SendNotification from "@/pages/admin/SendNotification";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const App = () => (
               <Route path="/admin/users" element={<UserManagement />} />
               <Route path="/admin/roles" element={<RolesPermissions />} />
               <Route path="/admin/activity" element={<SystemActivity />} />
+              <Route path="/admin/notifications" element={<SendNotification />} />
               <Route path="/admin/settings" element={<AdminSettings />} />
             </Route>
 
