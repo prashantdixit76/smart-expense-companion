@@ -78,6 +78,19 @@ const Login = () => {
             </p>
           </CardContent>
         </Card>
+
+        {/* Support Section */}
+        <div className="mt-6 text-center space-y-2">
+          <p className="text-sm font-medium text-muted-foreground">Need help? Contact Support</p>
+          <div className="flex items-center justify-center gap-4">
+            <a href="tel:+917668974586" className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
+              <Phone className="w-4 h-4" /> +91 7668974586
+            </a>
+            <a href="https://wa.me/917668974586" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-green-600 hover:underline">
+              <MessageCircle className="w-4 h-4" /> WhatsApp
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );
