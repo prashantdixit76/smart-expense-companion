@@ -180,6 +180,9 @@ const UserManagement = () => {
                           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => startEdit(u)} title="Edit">
                             <Pencil className="w-3.5 h-3.5" />
                           </Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setResetPasswordUser(u.id); setResetPass(''); }} title="Reset Password">
+                            <KeyRound className="w-3.5 h-3.5 text-primary" />
+                          </Button>
                           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => {
                             if (u.status === 'disabled') { enableUser(u.id); toast.success('User enabled.'); }
                             else { disableUser(u.id); toast.info('User disabled.'); }
