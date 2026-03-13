@@ -9,7 +9,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from 'sonner';
 
 const AdminDashboard = () => {
-  const { users, expenses } = useAppStore();
+  const { users, expenses, clearAllExpenses } = useAppStore();
+  const [showResetDialog, setShowResetDialog] = useState(false);
 
   const stats = useMemo(() => {
     const totalUsers = users.length;
