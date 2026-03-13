@@ -115,6 +115,30 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6 gradient-bg min-h-full">
+      {/* Important Notification Popup */}
+      <Dialog open={showImportant} onOpenChange={() => {}}>
+        <DialogContent className="max-w-md" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="w-5 h-5" /> Important Message
+            </DialogTitle>
+          </DialogHeader>
+          {importantNotifs[currentImportantIdx] && (
+            <div className="space-y-3">
+              <h3 className="font-bold text-foreground">{importantNotifs[currentImportantIdx].notifications?.title}</h3>
+              <p className="text-sm text-muted-foreground">{importantNotifs[currentImportantIdx].notifications?.message}</p>
+              {importantNotifs.length > 1 && (
+                <p className="text-xs text-muted-foreground">Message {currentImportantIdx + 1} of {importantNotifs.length}</p>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button onClick={handleDismissImportant} className="w-full">
+              {currentImportantIdx < importantNotifs.length - 1 ? 'OK, Next Message' : 'OK, I understand'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {/* Welcome Section */}
       <div className="animate-fade-in">
         <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">
