@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, UserCheck, Users, ShieldCheck, Activity, Settings, LogOut, Bell, TicketCheck
+  LayoutDashboard, UserCheck, Users, ShieldCheck, Activity, Settings, LogOut, Bell, TicketCheck, AlertTriangle
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useAppStore } from '@/store/useAppStore';
