@@ -38,6 +38,19 @@ export interface Settlement {
   amount: number;
 }
 
+export interface UdhariEntry {
+  id: string;
+  contactName: string;
+  phone?: string;
+  amount: number;
+  type: 'given' | 'taken'; // given = maine diya, taken = maine liya
+  description: string;
+  date: string;
+  settled: boolean;
+  settledDate?: string;
+  createdAt: string;
+}
+
 export interface SystemLog {
   id: string;
   action: string;

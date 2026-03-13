@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { User, UserRole, Expense, Income, SystemLog } from '@/types/expense';
+import { User, UserRole, Expense, Income, SystemLog, UdhariEntry } from '@/types/expense';
 
 interface AppState {
   currentUser: User | null;
@@ -12,6 +12,7 @@ interface AppState {
   incomes: Income[];
   customCategories: string[];
   systemLogs: SystemLog[];
+  udhpiEntries: UdhariEntry[];
 
   // Auth
   signup: (user: Omit<User, 'id' | 'status' | 'role' | 'createdAt'>, password: string) => { success: boolean; message: string };
@@ -39,6 +40,10 @@ interface AppState {
   addIncome: (income: Omit<Income, 'id' | 'createdAt'>) => void;
   deleteIncome: (id: string) => void;
   addCustomCategory: (category: string) => void;
+
+  // Udhari
+  addUdhari: (entry: Omit<UdhariEntry, 'id' | 'createdAt' | 'settled'>) => void;
+  settleUdhari: (id: string) => void;
 
   // Logs
   addLog: (action: string, details: string) => void;
@@ -111,6 +116,7 @@ export const useAppStore = create<AppState>()(
       incomes: [],
       customCategories: [],
       systemLogs: [],
+      udhpiEntries: [],
 
       signup: (userData, password) => {
         const { users } = get();
@@ -284,6 +290,24 @@ export const useAppStore = create<AppState>()(
       addCustomCategory: (category) => {
         const { customCategories } = get();
         if (!customCategories.includes(category)) set({ customCategories: [...customCategories, category] });
+      },
+
+      addUdhari: (entry) => {
+        const newEntry: UdhariEntry = {
+          ...entry,
+          id: crypto.randomUUID(),
+          settled: false,
+          createdAt: new Date().toISOString(),
+        };
+        set({ udhpiEntries: [...get().udhpiEntries, newEntry] });
+      },
+
+      settleUdhari: (id) => {
+        set({
+          udhpiEntries: get().udhpiEntries.map(e =>
+            e.id === id ? { ...e, settled: true, settledDate: new Date().toISOString() } : e
+          ),
+        });
       },
 
       addLog: (action, details) => {

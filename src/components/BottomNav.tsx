@@ -1,12 +1,12 @@
 import { NavLink as RouterNavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, ArrowDownCircle, List, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, ArrowDownCircle, HandCoins, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const items = [
   { title: 'Home', url: '/', icon: LayoutDashboard },
   { title: 'Expense', url: '/add-expense', icon: PlusCircle },
+  { title: 'Udhari', url: '/udhari', icon: HandCoins },
   { title: 'Income', url: '/add-income', icon: ArrowDownCircle },
-  { title: 'History', url: '/expenses', icon: List },
   { title: 'Reports', url: '/reports', icon: BarChart3 },
 ];
 
