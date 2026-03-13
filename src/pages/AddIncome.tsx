@@ -135,7 +135,7 @@ const AddIncome = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>Kya aap ye income delete karna chahte hain? Ye action undo nahi hoga.</AlertDialogDescription>
+            <AlertDialogDescription>Are you sure you want to delete this income? This action cannot be undone.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
