@@ -1,5 +1,5 @@
 import { NavLink as RouterNavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, ArrowDownCircle, HandCoins, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, ArrowDownCircle, HandCoins, BarChart3, UserCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const items = [
@@ -7,7 +7,7 @@ const items = [
   { title: 'Expense', url: '/add-expense', icon: PlusCircle },
   { title: 'Udhari', url: '/udhari', icon: HandCoins },
   { title: 'Income', url: '/add-income', icon: ArrowDownCircle },
-  { title: 'Reports', url: '/reports', icon: BarChart3 },
+  { title: 'Profile', url: '/profile', icon: UserCircle },
 ];
 
 export function BottomNav() {

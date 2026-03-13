@@ -66,22 +66,22 @@ const Reports = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Monthly Reports</h1>
+      <div className="flex items-center justify-between animate-fade-in">
+        <h1 className="text-2xl font-extrabold text-foreground tracking-tight">Monthly Reports</h1>
         <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-          <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="w-40 rounded-xl"><SelectValue /></SelectTrigger>
           <SelectContent>{months.map((m) => <SelectItem key={m} value={m}>{format(parseISO(m + '-01'), 'MMMM yyyy')}</SelectItem>)}</SelectContent>
         </Select>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-3 animate-fade-in">
         <div className="stat-card"><p className="text-xs text-muted-foreground font-medium">Income</p><p className="text-lg font-bold text-income">₹{stats.totalIncome.toLocaleString('en-IN')}</p></div>
         <div className="stat-card"><p className="text-xs text-muted-foreground font-medium">Expenses</p><p className="text-lg font-bold text-expense">₹{stats.totalExpenses.toLocaleString('en-IN')}</p></div>
         <div className="stat-card"><p className="text-xs text-muted-foreground font-medium">Balance</p><p className={`text-lg font-bold ${stats.balance >= 0 ? 'text-income' : 'text-expense'}`}>₹{stats.balance.toLocaleString('en-IN')}</p></div>
       </div>
 
-      <Card className="border-border/50">
-        <CardHeader className="pb-2"><CardTitle className="text-base">Category Breakdown</CardTitle></CardHeader>
+      <Card className="glass-card rounded-2xl animate-fade-in" style={{ animationDelay: '100ms' }}>
+        <CardHeader className="pb-2"><CardTitle className="text-base font-bold">🍩 Category Breakdown</CardTitle></CardHeader>
         <CardContent>
           {stats.categoryData.length > 0 ? (
             <>
@@ -90,14 +90,14 @@ const Reports = () => {
                   <Pie data={stats.categoryData} cx="50%" cy="50%" innerRadius={55} outerRadius={90} dataKey="value" label={({ name, percent }) => `${CATEGORY_ICONS[name] || '📦'} ${(percent * 100).toFixed(0)}%`}>
                     {stats.categoryData.map((_, idx) => <Cell key={idx} fill={COLORS[idx % COLORS.length]} />)}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.15)' }} />
                 </PieChart>
               </ResponsiveContainer>
               <div className="space-y-2 mt-4">
                 {stats.categoryData.map((c, idx) => (
-                  <div key={c.name} className="flex items-center justify-between text-sm">
+                  <div key={c.name} className="flex items-center justify-between text-sm p-2 rounded-xl hover:bg-muted/50 transition-colors">
                     <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[idx % COLORS.length] }} /><span>{CATEGORY_ICONS[c.name] || '📦'} {c.name}</span></div>
-                    <span className="font-medium">₹{c.value.toLocaleString('en-IN')}</span>
+                    <span className="font-bold">₹{c.value.toLocaleString('en-IN')}</span>
                   </div>
                 ))}
               </div>

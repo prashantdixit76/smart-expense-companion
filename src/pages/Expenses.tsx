@@ -70,48 +70,67 @@ const Expenses = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Expense History</h1>
-        <Button variant="outline" size="sm" className="gap-2" onClick={() => setShowFilters(!showFilters)}><Filter className="w-4 h-4" /> Filters</Button>
+      <div className="flex items-center justify-between animate-fade-in">
+        <h1 className="text-2xl font-extrabold text-foreground tracking-tight">Expense History</h1>
+        <Button variant="outline" size="sm" className="gap-2 rounded-xl" onClick={() => setShowFilters(!showFilters)}>
+          <Filter className="w-4 h-4" /> Filters
+        </Button>
       </div>
 
       {showFilters && (
-        <Card className="border-border/50">
+        <Card className="glass-card rounded-2xl animate-fade-in">
           <CardContent className="pt-4 space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1"><Label className="text-xs">Category</Label><Select value={filters.category} onValueChange={(v) => setFilters({ ...filters, category: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All Categories</SelectItem>{allCategories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent></Select></div>
-              <div className="space-y-1"><Label className="text-xs">Type</Label><Select value={filters.type} onValueChange={(v) => setFilters({ ...filters, type: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All</SelectItem><SelectItem value="personal">Personal</SelectItem><SelectItem value="group">Group</SelectItem></SelectContent></Select></div>
+              <div className="space-y-1">
+                <Label className="text-xs">Category</Label>
+                <Select value={filters.category} onValueChange={(v) => setFilters({ ...filters, category: v })}>
+                  <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                  <SelectContent>{[<SelectItem key="all" value="all">All Categories</SelectItem>, ...allCategories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)]}</SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Type</Label>
+                <Select value={filters.type} onValueChange={(v) => setFilters({ ...filters, type: v })}>
+                  <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                  <SelectContent><SelectItem value="all">All</SelectItem><SelectItem value="personal">Personal</SelectItem><SelectItem value="group">Group</SelectItem></SelectContent>
+                </Select>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1"><Label className="text-xs">From</Label><Input type="date" value={filters.dateFrom} onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })} /></div>
-              <div className="space-y-1"><Label className="text-xs">To</Label><Input type="date" value={filters.dateTo} onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })} /></div>
+              <div className="space-y-1"><Label className="text-xs">From</Label><Input type="date" className="rounded-xl" value={filters.dateFrom} onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })} /></div>
+              <div className="space-y-1"><Label className="text-xs">To</Label><Input type="date" className="rounded-xl" value={filters.dateTo} onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })} /></div>
             </div>
           </CardContent>
         </Card>
       )}
 
       {filtered.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground"><p className="text-lg">No expenses found</p><p className="text-sm mt-1">Add your first expense to see it here.</p></div>
+        <div className="text-center py-16 text-muted-foreground animate-fade-in">
+          <p className="text-lg font-semibold">No expenses found</p>
+          <p className="text-sm mt-1">Add your first expense to see it here.</p>
+        </div>
       ) : (
         <div className="space-y-2">
-          {filtered.map((e) => (
-            <Card key={e.id} className="border-border/50">
+          {filtered.map((e, idx) => (
+            <Card key={e.id} className="glass-card rounded-2xl card-hover-glow animate-fade-in" style={{ animationDelay: `${idx * 40}ms` }}>
               <CardContent className="p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
-                    <span className="text-2xl mt-0.5">{CATEGORY_ICONS[e.category] || '📦'}</span>
-                    <div>
-                      <p className="font-medium text-foreground">{e.description || e.category}</p>
+                    <div className="w-10 h-10 rounded-xl bg-muted/80 flex items-center justify-center text-lg shrink-0">
+                      {CATEGORY_ICONS[e.category] || '📦'}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-foreground text-sm truncate">{e.description || e.category}</p>
                       <p className="text-xs text-muted-foreground">{e.category} · {format(parseISO(e.date), 'dd MMM yyyy')}</p>
                       {e.type === 'group' && e.split_with && e.split_with.length > 0 && (
                         <p className="text-xs text-primary mt-0.5">Split with: {e.split_with.join(', ')} · ₹{(e.amount / (e.split_with.length + 1)).toFixed(2)} each</p>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <span className="text-base font-bold text-expense mr-1">-₹{e.amount.toLocaleString('en-IN')}</span>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => openEdit(e)}><Pencil className="w-4 h-4" /></Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => setDeleteId(e.id)}><Trash2 className="w-4 h-4" /></Button>
+                  <div className="flex items-center gap-0.5 shrink-0 ml-2">
+                    <span className="text-sm font-bold text-expense mr-1">-₹{e.amount.toLocaleString('en-IN')}</span>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary rounded-xl" onClick={() => openEdit(e)}><Pencil className="w-4 h-4" /></Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive rounded-xl" onClick={() => setDeleteId(e.id)}><Trash2 className="w-4 h-4" /></Button>
                   </div>
                 </div>
               </CardContent>
@@ -121,22 +140,22 @@ const Expenses = () => {
       )}
 
       <Dialog open={!!editItem} onOpenChange={(open) => !open && setEditItem(null)}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="glass-card rounded-2xl max-w-[calc(100vw-2rem)] sm:max-w-md">
           <DialogHeader><DialogTitle>Edit Expense</DialogTitle></DialogHeader>
           <div className="space-y-4 pt-2">
-            <div><Label>Amount (₹)</Label><Input type="number" value={editForm.amount} onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })} /></div>
-            <div><Label>Category</Label><Select value={editForm.category} onValueChange={(v) => setEditForm({ ...editForm, category: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{allCategories.map((c) => <SelectItem key={c} value={c}>{CATEGORY_ICONS[c] || '📦'} {c}</SelectItem>)}</SelectContent></Select></div>
-            <div><Label>Description</Label><Textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} rows={2} /></div>
-            <div><Label>Date</Label><Input type="date" value={editForm.date} onChange={(e) => setEditForm({ ...editForm, date: e.target.value })} /></div>
-            <Button className="w-full" onClick={handleUpdate}>Save Changes</Button>
+            <div><Label>Amount (₹)</Label><Input type="number" className="rounded-xl" value={editForm.amount} onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })} /></div>
+            <div><Label>Category</Label><Select value={editForm.category} onValueChange={(v) => setEditForm({ ...editForm, category: v })}><SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger><SelectContent>{allCategories.map((c) => <SelectItem key={c} value={c}>{CATEGORY_ICONS[c] || '📦'} {c}</SelectItem>)}</SelectContent></Select></div>
+            <div><Label>Description</Label><Textarea className="rounded-xl" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} rows={2} /></div>
+            <div><Label>Date</Label><Input type="date" className="rounded-xl" value={editForm.date} onChange={(e) => setEditForm({ ...editForm, date: e.target.value })} /></div>
+            <Button className="w-full rounded-xl gradient-primary text-primary-foreground" onClick={handleUpdate}>Save Changes</Button>
           </div>
         </DialogContent>
       </Dialog>
 
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="glass-card rounded-2xl max-w-[calc(100vw-2rem)] sm:max-w-lg">
           <AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
-          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction></AlertDialogFooter>
+          <AlertDialogFooter><AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel><AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl">Delete</AlertDialogAction></AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>

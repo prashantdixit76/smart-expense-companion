@@ -83,18 +83,18 @@ const AddExpense = () => {
 
   return (
     <div className="max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold text-foreground mb-6">Add Expense</h1>
-      <Card className="border-border/50">
+      <h1 className="text-2xl font-extrabold text-foreground tracking-tight mb-6 animate-fade-in">Add Expense</h1>
+      <Card className="glass-card rounded-2xl animate-fade-in">
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label>Amount (₹)</Label>
-              <Input type="number" placeholder="0.00" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} required />
+              <Input type="number" placeholder="0.00" className="rounded-xl" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} required />
             </div>
             <div className="space-y-2">
               <Label>Category</Label>
               <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
-                <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Select category" /></SelectTrigger>
                 <SelectContent>
                   {allCategories.map((c) => <SelectItem key={c} value={c}>{CATEGORY_ICONS[c] || '📦'} {c}</SelectItem>)}
                 </SelectContent>
@@ -102,11 +102,11 @@ const AddExpense = () => {
             </div>
             <div className="space-y-2">
               <Label>Description</Label>
-              <Textarea placeholder="What was this expense for?" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} />
+              <Textarea placeholder="What was this expense for?" className="rounded-xl" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} />
             </div>
             <div className="space-y-2">
               <Label>Date</Label>
-              <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+              <Input type="date" className="rounded-xl" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
             </div>
             <div className="space-y-2">
               <Label>Expense Type</Label>
@@ -119,13 +119,13 @@ const AddExpense = () => {
             </div>
 
             {form.type === 'group' && (
-              <div className="space-y-4 p-4 rounded-lg border border-border bg-muted/30">
+              <div className="space-y-4 p-4 rounded-xl border border-border/40 bg-muted/30">
                 <div className="flex items-center gap-2 text-sm font-semibold text-foreground"><Users className="w-4 h-4" /> Group Details</div>
                 <div className="space-y-2">
                   <Label>Members</Label>
                   <div className="flex gap-2">
-                    <Input placeholder="Enter member name" value={newMember} onChange={(e) => setNewMember(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddMember(); } }} />
-                    <Button type="button" size="sm" variant="outline" onClick={handleAddMember} className="shrink-0"><UserPlus className="w-4 h-4" /></Button>
+                    <Input placeholder="Enter member name" className="rounded-xl" value={newMember} onChange={(e) => setNewMember(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddMember(); } }} />
+                    <Button type="button" size="sm" variant="outline" onClick={handleAddMember} className="shrink-0 rounded-xl"><UserPlus className="w-4 h-4" /></Button>
                   </div>
                   <div className="flex flex-wrap gap-2 mt-2">
                     <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-primary text-primary-foreground">Me (You)</span>
@@ -141,14 +141,14 @@ const AddExpense = () => {
                   <div className="space-y-3">
                     <Label>Each Member's Share (₹)</Label>
                     <p className="text-xs text-muted-foreground">Leave empty for equal split (₹{equalShare.toFixed(2)} each)</p>
-                    <div className="flex items-center gap-3"><span className="text-sm font-medium text-foreground w-24 truncate">Me (You)</span><Input type="number" placeholder={`₹${equalShare.toFixed(2)}`} value={memberShares['Me'] || ''} onChange={(e) => setMemberShares({ ...memberShares, Me: e.target.value })} className="flex-1" /></div>
+                    <div className="flex items-center gap-3"><span className="text-sm font-medium text-foreground w-24 truncate">Me (You)</span><Input type="number" className="rounded-xl" placeholder={`₹${equalShare.toFixed(2)}`} value={memberShares['Me'] || ''} onChange={(e) => setMemberShares({ ...memberShares, Me: e.target.value })} /></div>
                     {members.map((m) => (
-                      <div key={m} className="flex items-center gap-3"><span className="text-sm font-medium text-foreground w-24 truncate">{m}</span><Input type="number" placeholder={`₹${equalShare.toFixed(2)}`} value={memberShares[m] || ''} onChange={(e) => setMemberShares({ ...memberShares, [m]: e.target.value })} className="flex-1" /></div>
+                      <div key={m} className="flex items-center gap-3"><span className="text-sm font-medium text-foreground w-24 truncate">{m}</span><Input type="number" className="rounded-xl" placeholder={`₹${equalShare.toFixed(2)}`} value={memberShares[m] || ''} onChange={(e) => setMemberShares({ ...memberShares, [m]: e.target.value })} /></div>
                     ))}
                   </div>
                 )}
                 {totalAmount > 0 && members.length > 0 && (
-                  <div className="p-3 rounded-lg bg-accent/50 space-y-1 text-sm">
+                  <div className="p-3 rounded-xl bg-accent/50 space-y-1 text-sm">
                     <p className="font-medium text-foreground">Split Summary</p>
                     <p className="text-muted-foreground">Total: <strong className="text-foreground">₹{totalAmount.toFixed(2)}</strong></p>
                     <p className="text-muted-foreground">Members: <strong className="text-foreground">{totalMembers}</strong></p>
@@ -159,7 +159,7 @@ const AddExpense = () => {
               </div>
             )}
 
-            <Button type="submit" className="w-full gap-2"><PlusCircle className="w-4 h-4" /> Add Expense</Button>
+            <Button type="submit" className="w-full gap-2 rounded-xl gradient-primary text-primary-foreground h-11"><PlusCircle className="w-4 h-4" /> Add Expense</Button>
           </form>
         </CardContent>
       </Card>
