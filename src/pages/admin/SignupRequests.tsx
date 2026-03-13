@@ -2,7 +2,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, XCircle, Clock, Mail, Phone, Calendar } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Mail, Phone, Calendar, Crown } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, parseISO } from 'date-fns';
 
@@ -48,6 +48,14 @@ const SignupRequests = () => {
                         {(() => { try { return format(parseISO(u.createdAt), 'dd MMM yyyy'); } catch { return 'N/A'; } })()}
                       </span>
                     </div>
+                    {u.selectedPlan && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px] gap-1">
+                          <Crown className="w-3 h-3" />
+                          <span className="capitalize">{u.selectedPlan}</span> — ₹{u.planPrice} / {u.planDuration}
+                        </Badge>
+                      </div>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     <Button size="sm" className="gap-1" onClick={() => { approveUser(u.id); toast.success(`${u.fullName} approved!`); }}>

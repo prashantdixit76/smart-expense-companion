@@ -40,7 +40,12 @@ const Signup = () => {
       return;
     }
     const result = signup(
-      { fullName: form.fullName, email: form.email, phone: form.phone },
+      {
+        fullName: form.fullName,
+        email: form.email,
+        phone: form.phone,
+        ...(selectedPlan ? { selectedPlan, planPrice: Number(selectedPrice), planDuration: selectedDuration || '' } : {}),
+      },
       form.password
     );
     if (result.success) {
