@@ -148,11 +148,7 @@ const Login = () => {
           </div>
         </div>
 
-        <div className="mt-8 text-center">
-          <Link to="/raise-ticket" className="inline-flex items-center gap-2 text-sm text-primary hover:underline font-medium">
-            <LifeBuoy className="w-4 h-4" /> Need Help? Raise a Support Ticket
-          </Link>
-        </div>
+        <LoginTicketDialog />
       </div>
     </div>
   );
