@@ -28,15 +28,15 @@ export default function Udhari() {
   });
 
   const summary = useMemo(() => {
-    const totalGiven = udhpiEntries.filter(e => e.type === 'given').reduce((s, e) => s + e.amount, 0);
-    const totalTaken = udhpiEntries.filter(e => e.type === 'taken').reduce((s, e) => s + e.amount, 0);
+    const allGiven = udhpiEntries.filter(e => e.type === 'given').reduce((s, e) => s + e.amount, 0);
+    const allTaken = udhpiEntries.filter(e => e.type === 'taken').reduce((s, e) => s + e.amount, 0);
     const settledGiven = udhpiEntries.filter(e => e.type === 'given' && e.settled).reduce((s, e) => s + e.amount, 0);
     const settledTaken = udhpiEntries.filter(e => e.type === 'taken' && e.settled).reduce((s, e) => s + e.amount, 0);
     return {
-      totalGiven,
-      totalTaken,
-      pendingGiven: totalGiven - settledGiven,
-      pendingTaken: totalTaken - settledTaken,
+      totalGiven: allGiven - settledGiven,
+      totalTaken: allTaken - settledTaken,
+      pendingGiven: allGiven - settledGiven,
+      pendingTaken: allTaken - settledTaken,
     };
   }, [udhpiEntries]);
 
