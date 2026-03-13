@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { useAppStore } from '@/store/useAppStore';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wallet, UserPlus } from 'lucide-react';
+import { Wallet, UserPlus, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -24,14 +24,15 @@ const Signup = () => {
     password: '',
     confirmPassword: '',
   });
-  const signup = useAppStore((s) => s.signup);
+  const [submitting, setSubmitting] = useState(false);
+  const { signUp } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (form.password !== form.confirmPassword) {
       toast.error('Passwords do not match.');
@@ -41,15 +42,13 @@ const Signup = () => {
       toast.error('Password must be at least 6 characters.');
       return;
     }
-    const result = signup(
-      {
-        fullName: form.fullName,
-        email: form.email,
-        phone: form.phone,
-        ...(selectedPlan ? { selectedPlan, planPrice: Number(selectedPrice), planDuration: selectedDuration || '' } : {}),
-      },
-      form.password
-    );
+    setSubmitting(true);
+    const result = await signUp(form.email, form.password, {
+      full_name: form.fullName,
+      phone: form.phone,
+      ...(selectedPlan ? { selected_plan: selectedPlan, plan_price: selectedPrice || '', plan_duration: selectedDuration || '' } : {}),
+    });
+    setSubmitting(false);
     if (result.success) {
       toast.success(result.message);
       navigate('/login');
@@ -109,8 +108,8 @@ const Signup = () => {
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <Input id="confirmPassword" type="password" placeholder="••••••••" value={form.confirmPassword} onChange={(e) => handleChange('confirmPassword', e.target.value)} required />
               </div>
-              <Button type="submit" className="w-full gap-2">
-                <UserPlus className="w-4 h-4" />
+              <Button type="submit" className="w-full gap-2" disabled={submitting}>
+                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
                 Create Account
               </Button>
             </form>

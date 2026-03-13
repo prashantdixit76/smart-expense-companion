@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { InstallPrompt } from "@/components/InstallPrompt";
-import { useOfflineSync } from "@/hooks/useOfflineSync";
+import { AuthProvider } from "@/hooks/useAuth";
 import AppLayout from "@/layouts/AppLayout";
 import AdminLayout from "@/layouts/AdminLayout";
 import Login from "@/pages/Login";
@@ -28,53 +28,43 @@ import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const AppContent = () => {
-  useOfflineSync();
-
-  return (
-    <>
-      <OfflineIndicator />
-      <InstallPrompt />
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-
-          {/* Admin panel - hidden route */}
-          <Route path="/admin" element={<AdminLogin />} />
-          <Route element={<AdminLayout />}>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/requests" element={<SignupRequests />} />
-            <Route path="/admin/users" element={<UserManagement />} />
-            <Route path="/admin/roles" element={<RolesPermissions />} />
-            <Route path="/admin/activity" element={<SystemActivity />} />
-            <Route path="/admin/settings" element={<AdminSettings />} />
-          </Route>
-
-          {/* User app */}
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/add-expense" element={<AddExpense />} />
-            <Route path="/add-income" element={<AddIncome />} />
-            <Route path="/expenses" element={<Expenses />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/udhari" element={<Udhari />} />
-            <Route path="/profile" element={<Profile />} />
-          </Route>
-
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </>
-  );
-};
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AppContent />
+      <AuthProvider>
+        <OfflineIndicator />
+        <InstallPrompt />
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+
+            <Route path="/admin" element={<AdminLogin />} />
+            <Route element={<AdminLayout />}>
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/requests" element={<SignupRequests />} />
+              <Route path="/admin/users" element={<UserManagement />} />
+              <Route path="/admin/roles" element={<RolesPermissions />} />
+              <Route path="/admin/activity" element={<SystemActivity />} />
+              <Route path="/admin/settings" element={<AdminSettings />} />
+            </Route>
+
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/add-expense" element={<AddExpense />} />
+              <Route path="/add-income" element={<AddIncome />} />
+              <Route path="/expenses" element={<Expenses />} />
+              <Route path="/reports" element={<Reports />} />
+              <Route path="/udhari" element={<Udhari />} />
+              <Route path="/profile" element={<Profile />} />
+            </Route>
+
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
