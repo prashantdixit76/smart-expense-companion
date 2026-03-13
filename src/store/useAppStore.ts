@@ -116,6 +116,7 @@ export const useAppStore = create<AppState>()(
       incomes: [],
       customCategories: [],
       systemLogs: [],
+      udhpiEntries: [],
 
       signup: (userData, password) => {
         const { users } = get();
