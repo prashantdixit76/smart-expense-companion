@@ -292,6 +292,24 @@ export const useAppStore = create<AppState>()(
         if (!customCategories.includes(category)) set({ customCategories: [...customCategories, category] });
       },
 
+      addUdhari: (entry) => {
+        const newEntry: UdhariEntry = {
+          ...entry,
+          id: crypto.randomUUID(),
+          settled: false,
+          createdAt: new Date().toISOString(),
+        };
+        set({ udhpiEntries: [...get().udhpiEntries, newEntry] });
+      },
+
+      settleUdhari: (id) => {
+        set({
+          udhpiEntries: get().udhpiEntries.map(e =>
+            e.id === id ? { ...e, settled: true, settledDate: new Date().toISOString() } : e
+          ),
+        });
+      },
+
       addLog: (action, details) => {
         const { systemLogs, currentUser, adminUser } = get();
         const actor = adminUser || currentUser;
