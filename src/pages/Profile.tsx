@@ -210,6 +210,15 @@ const Profile = () => {
 
       <Button
         variant="outline"
+        className="w-full gap-2 h-11 rounded-xl border-primary/50 text-primary hover:bg-primary/10"
+        onClick={() => navigate('/raise-ticket')}
+      >
+        <TicketPlus className="w-4 h-4" />
+        Raise a Ticket
+      </Button>
+
+      <Button
+        variant="outline"
         className="w-full gap-2 h-11 rounded-xl border-destructive/50 text-destructive hover:bg-destructive/10"
         onClick={handleResetMonth}
         disabled={resetting}
