@@ -113,6 +113,11 @@ export default function SupportTickets() {
                     <span className="flex items-center gap-1"><User className="w-3 h-3" /> {t.name}</span>
                     <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {t.email}</span>
                     {t.phone && <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {t.phone}</span>}
+                    {(t as any).source && (
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                        {(t as any).source === 'login_page' ? '📍 Login Page' : '📍 Dashboard'}
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-[10px] text-muted-foreground mt-2">
                     {new Date(t.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}

@@ -56,7 +56,8 @@ export default function RaiseTicket() {
         phone: phone.trim() || null,
         subject: subject.trim(),
         message: message.trim(),
-      });
+        source: 'dashboard',
+      } as any);
       if (error) throw error;
       toast.success('Ticket raised successfully!');
       setSubject('');
