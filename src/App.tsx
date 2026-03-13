@@ -52,6 +52,7 @@ const App = () => (
               <Route path="/admin/roles" element={<RolesPermissions />} />
               <Route path="/admin/activity" element={<SystemActivity />} />
               <Route path="/admin/notifications" element={<SendNotification />} />
+              <Route path="/admin/tickets" element={<SupportTickets />} />
               <Route path="/admin/settings" element={<AdminSettings />} />
             </Route>
 
