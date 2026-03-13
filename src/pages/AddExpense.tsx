@@ -55,7 +55,9 @@ const AddExpense = () => {
 
   const handleRemoveMember = (name: string) => {
     setMembers(members.filter((m) => m !== name));
-    if (paidBy === name) setPaidBy('Me');
+    const newShares = { ...memberShares };
+    delete newShares[name];
+    setMemberShares(newShares);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
