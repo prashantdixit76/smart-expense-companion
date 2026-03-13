@@ -36,13 +36,17 @@ interface AppState {
 
   // Data
   addExpense: (expense: Omit<Expense, 'id' | 'createdAt'>) => void;
+  updateExpense: (id: string, data: Partial<Omit<Expense, 'id' | 'createdAt'>>) => void;
   deleteExpense: (id: string) => void;
   addIncome: (income: Omit<Income, 'id' | 'createdAt'>) => void;
+  updateIncome: (id: string, data: Partial<Omit<Income, 'id' | 'createdAt'>>) => void;
   deleteIncome: (id: string) => void;
   addCustomCategory: (category: string) => void;
 
   // Udhari
   addUdhari: (entry: Omit<UdhariEntry, 'id' | 'createdAt' | 'settled'>) => void;
+  updateUdhari: (id: string, data: Partial<Omit<UdhariEntry, 'id' | 'createdAt'>>) => void;
+  deleteUdhari: (id: string) => void;
   settleUdhari: (id: string) => void;
 
   // Logs
@@ -278,11 +282,19 @@ export const useAppStore = create<AppState>()(
         set({ expenses: [...get().expenses, newExpense] });
       },
 
+      updateExpense: (id, data) => {
+        set({ expenses: get().expenses.map(e => e.id === id ? { ...e, ...data } : e) });
+      },
+
       deleteExpense: (id) => set({ expenses: get().expenses.filter((e) => e.id !== id) }),
 
       addIncome: (income) => {
         const newIncome: Income = { ...income, id: crypto.randomUUID(), createdAt: new Date().toISOString() };
         set({ incomes: [...get().incomes, newIncome] });
+      },
+
+      updateIncome: (id, data) => {
+        set({ incomes: get().incomes.map(i => i.id === id ? { ...i, ...data } : i) });
       },
 
       deleteIncome: (id) => set({ incomes: get().incomes.filter((i) => i.id !== id) }),
@@ -300,6 +312,14 @@ export const useAppStore = create<AppState>()(
           createdAt: new Date().toISOString(),
         };
         set({ udhpiEntries: [...get().udhpiEntries, newEntry] });
+      },
+
+      updateUdhari: (id, data) => {
+        set({ udhpiEntries: get().udhpiEntries.map(e => e.id === id ? { ...e, ...data } : e) });
+      },
+
+      deleteUdhari: (id) => {
+        set({ udhpiEntries: get().udhpiEntries.filter(e => e.id !== id) });
       },
 
       settleUdhari: (id) => {
