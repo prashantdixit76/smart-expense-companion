@@ -58,64 +58,70 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
-      <div className="absolute top-4 right-4 flex items-center gap-2">
+    <div className="min-h-screen flex items-center justify-center gradient-bg-auth p-4 relative overflow-hidden">
+      {/* Decorative blobs */}
+      <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-[-20%] left-[-10%] w-[400px] h-[400px] rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+
+      <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
         <InstallButton />
         <ThemeToggle />
       </div>
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-4">
-            <Wallet className="w-7 h-7 text-primary" />
+      <div className="w-full max-w-md relative z-10">
+        <div className="text-center mb-8 animate-fade-in">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary mb-4 shadow-lg shadow-primary/25 animate-float">
+            <Wallet className="w-8 h-8 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">Create Account</h1>
-          <p className="text-muted-foreground mt-1">Join Smart Expense Tracker</p>
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+            Create <span className="text-gradient">Account</span>
+          </h1>
+          <p className="text-muted-foreground mt-2">Join Smart Expense Tracker</p>
         </div>
 
-        <Card className="border-border/50 shadow-lg">
+        <Card className="glass-card border-border/30 shadow-xl animate-fade-in">
           {selectedPlan && (
-            <div className="bg-primary/5 border-b border-border/50 px-6 py-3 flex items-center justify-between rounded-t-lg">
+            <div className="gradient-primary px-6 py-3.5 flex items-center justify-between rounded-t-xl">
               <div>
-                <p className="text-sm font-semibold text-foreground">Selected Plan: <span className="capitalize">{selectedPlan}</span></p>
-                <p className="text-xs text-muted-foreground">{selectedDuration}</p>
+                <p className="text-sm font-semibold text-primary-foreground">Plan: <span className="capitalize">{selectedPlan}</span></p>
+                <p className="text-xs text-primary-foreground/80">{selectedDuration}</p>
               </div>
-              <Badge className="bg-primary text-primary-foreground">₹{selectedPrice}</Badge>
+              <Badge className="bg-white/20 text-primary-foreground border-0 text-sm font-bold">₹{selectedPrice}</Badge>
             </div>
           )}
           <CardHeader className="pb-4">
-            <CardTitle className="text-xl">Sign Up</CardTitle>
+            <CardTitle className="text-xl">Sign Up ✨</CardTitle>
             <CardDescription>Fill in your details to get started</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="fullName">Full Name</Label>
-                <Input id="fullName" placeholder="John Doe" value={form.fullName} onChange={(e) => handleChange('fullName', e.target.value)} required />
+                <Input id="fullName" placeholder="John Doe" value={form.fullName} onChange={(e) => handleChange('fullName', e.target.value)} required className="h-11 bg-background/50" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email Address</Label>
-                <Input id="email" type="email" placeholder="you@example.com" value={form.email} onChange={(e) => handleChange('email', e.target.value)} required />
+                <Input id="email" type="email" placeholder="you@example.com" value={form.email} onChange={(e) => handleChange('email', e.target.value)} required className="h-11 bg-background/50" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone Number</Label>
-                <Input id="phone" type="tel" placeholder="+1 234 567 890" value={form.phone} onChange={(e) => handleChange('phone', e.target.value)} required />
+                <Input id="phone" type="tel" placeholder="+1 234 567 890" value={form.phone} onChange={(e) => handleChange('phone', e.target.value)} required className="h-11 bg-background/50" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder="••••••••" value={form.password} onChange={(e) => handleChange('password', e.target.value)} required />
+                <Input id="password" type="password" placeholder="••••••••" value={form.password} onChange={(e) => handleChange('password', e.target.value)} required className="h-11 bg-background/50" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input id="confirmPassword" type="password" placeholder="••••••••" value={form.confirmPassword} onChange={(e) => handleChange('confirmPassword', e.target.value)} required />
+                <Input id="confirmPassword" type="password" placeholder="••••••••" value={form.confirmPassword} onChange={(e) => handleChange('confirmPassword', e.target.value)} required className="h-11 bg-background/50" />
               </div>
-              <Button type="submit" className="w-full gap-2" disabled={submitting}>
+              <Button type="submit" className="w-full gap-2 h-11 gradient-primary text-primary-foreground shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300" disabled={submitting}>
                 {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
                 Create Account
               </Button>
             </form>
             <p className="text-center text-sm text-muted-foreground mt-4">
               Already have an account?{' '}
-              <Link to="/login" className="text-primary font-medium hover:underline">
+              <Link to="/login" className="text-primary font-semibold hover:underline">
                 Sign in
               </Link>
             </p>

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wallet, LogIn, Phone, MessageCircle, Check, Crown, Loader2 } from 'lucide-react';
+import { Wallet, LogIn, Phone, MessageCircle, Check, Crown, Loader2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -51,87 +51,107 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 pb-12 relative">
-      <div className="absolute top-4 right-4 flex items-center gap-2">
+    <div className="min-h-screen gradient-bg-auth p-4 pb-12 relative overflow-hidden">
+      {/* Decorative blobs */}
+      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+
+      <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
         <InstallButton />
         <ThemeToggle />
       </div>
 
-      <div className="max-w-md mx-auto pt-8">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-4">
-            <Wallet className="w-7 h-7 text-primary" />
+      <div className="max-w-md mx-auto pt-8 relative z-10">
+        <div className="text-center mb-8 animate-fade-in">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary mb-4 shadow-lg shadow-primary/25 animate-float">
+            <Wallet className="w-8 h-8 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">Smart Expense Tracker</h1>
-          <p className="text-muted-foreground mt-1">Track, split, and manage your money</p>
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+            Smart Expense <span className="text-gradient">Tracker</span>
+          </h1>
+          <p className="text-muted-foreground mt-2">Track, split, and manage your money smartly</p>
         </div>
 
-        <Card className="border-border/50 shadow-lg">
+        <Card className="glass-card border-border/30 shadow-xl animate-fade-in">
           <CardHeader className="pb-4">
-            <CardTitle className="text-xl">Welcome back</CardTitle>
+            <CardTitle className="text-xl">Welcome back ✨</CardTitle>
             <CardDescription>Sign in to your account</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-11 bg-background/50" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required className="h-11 bg-background/50" />
               </div>
-              <Button type="submit" className="w-full gap-2" disabled={submitting}>
+              <Button type="submit" className="w-full gap-2 h-11 gradient-primary text-primary-foreground shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300" disabled={submitting}>
                 {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
                 Sign In
               </Button>
             </form>
             <p className="text-center text-sm text-muted-foreground mt-4">
               Don't have an account?{' '}
-              <Link to="/signup" className="text-primary font-medium hover:underline">Sign up</Link>
+              <Link to="/signup" className="text-primary font-semibold hover:underline">Sign up</Link>
             </p>
           </CardContent>
         </Card>
 
         {/* Pricing Section */}
-        <div className="mt-10">
+        <div className="mt-12 animate-fade-in">
           <div className="text-center mb-6">
             <h2 className="text-xl font-bold text-foreground flex items-center justify-center gap-2">
-              <Crown className="w-5 h-5 text-primary" /> Our Plans
+              <Sparkles className="w-5 h-5 text-primary" /> Our Plans
             </h2>
             <p className="text-sm text-muted-foreground mt-1">Choose a plan that suits you</p>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {plans.map((plan) => (
-              <button key={plan.id} onClick={() => handlePlanClick(plan)} className={`relative rounded-xl border p-4 text-left transition-all hover:shadow-md hover:scale-[1.02] active:scale-[0.98] ${plan.popular ? 'border-primary bg-primary/5 shadow-sm' : 'border-border/50 bg-card'}`}>
-                {plan.popular && <Badge className="absolute -top-2.5 right-2 bg-primary text-primary-foreground text-[10px] px-2">Popular</Badge>}
-                {plan.best && <Badge className="absolute -top-2.5 right-2 bg-accent text-accent-foreground text-[10px] px-2">Best Value</Badge>}
-                <p className="text-sm font-semibold text-foreground">{plan.name}</p>
-                <p className="text-2xl font-bold text-primary mt-1">₹{plan.price}</p>
+            {plans.map((plan, idx) => (
+              <button
+                key={plan.id}
+                onClick={() => handlePlanClick(plan)}
+                className={`relative rounded-2xl border p-4 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 active:scale-[0.98] group ${
+                  plan.popular
+                    ? 'border-primary/50 bg-primary/5 shadow-md shadow-primary/10'
+                    : 'border-border/40 bg-card/80 backdrop-blur-sm hover:border-primary/30'
+                }`}
+                style={{ animationDelay: `${idx * 100}ms` }}
+              >
+                {plan.popular && <Badge className="absolute -top-2.5 right-2 gradient-primary text-primary-foreground text-[10px] px-2.5 shadow-sm">Popular</Badge>}
+                {plan.best && <Badge className="absolute -top-2.5 right-2 bg-warning text-warning-foreground text-[10px] px-2.5 shadow-sm">Best Value</Badge>}
+                <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{plan.name}</p>
+                <p className="text-2xl font-extrabold text-gradient mt-1">₹{plan.price}</p>
                 <p className="text-xs text-muted-foreground">{plan.duration}</p>
                 <p className="text-[10px] text-muted-foreground mt-1">~₹{plan.perMonth}/mo</p>
               </button>
             ))}
           </div>
-          <div className="mt-5 bg-card border border-border/50 rounded-xl p-4">
-            <p className="text-sm font-semibold text-foreground mb-3">All plans include:</p>
-            <ul className="space-y-2">
+          <div className="mt-5 glass-card rounded-2xl p-5">
+            <p className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+              <Check className="w-4 h-4 text-primary" /> All plans include:
+            </p>
+            <ul className="space-y-2.5">
               {features.map((f) => (
-                <li key={f} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Check className="w-4 h-4 text-primary flex-shrink-0" /> {f}
+                <li key={f} className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-primary" />
+                  </div>
+                  {f}
                 </li>
               ))}
             </ul>
           </div>
         </div>
 
-        <div className="mt-6 text-center space-y-2">
+        <div className="mt-8 text-center space-y-3">
           <p className="text-sm font-medium text-muted-foreground">Need help? Contact Support</p>
           <div className="flex items-center justify-center gap-4">
-            <a href="tel:+917668974586" className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
+            <a href="tel:+917668974586" className="inline-flex items-center gap-2 text-sm text-primary hover:underline font-medium">
               <Phone className="w-4 h-4" /> +91 7668974586
             </a>
-            <a href="https://wa.me/917668974586" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-green-600 hover:underline">
+            <a href="https://wa.me/917668974586" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-medium text-green-600 hover:underline">
               <MessageCircle className="w-4 h-4" /> WhatsApp
             </a>
           </div>
