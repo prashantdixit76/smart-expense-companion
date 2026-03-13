@@ -1,4 +1,5 @@
 import { useMemo, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { CATEGORY_ICONS } from '@/types/expense';
@@ -112,7 +113,7 @@ const Dashboard = () => {
 
       {/* Quick Reports Access - Mobile */}
       <div className="md:hidden animate-fade-in" style={{ animationDelay: '180ms' }}>
-        <a href="/reports" className="block">
+        <Link to="/reports" className="block">
           <Card className="glass-card rounded-2xl card-hover-glow">
             <CardContent className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -127,7 +128,7 @@ const Dashboard = () => {
               <ArrowUpRight className="w-5 h-5 text-muted-foreground" />
             </CardContent>
           </Card>
-        </a>
+        </Link>
       </div>
 
       {/* Charts */}
