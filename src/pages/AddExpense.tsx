@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { CATEGORIES, CATEGORY_ICONS } from '@/types/expense';
+import { saveOfflineExpense } from '@/lib/offlineDb';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
