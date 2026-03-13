@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wallet, LogIn, Phone, MessageCircle, Check, Crown } from 'lucide-react';
+import { Wallet, LogIn, Phone, MessageCircle, Check, Crown, Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 
@@ -27,8 +27,24 @@ const features = [
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
   const login = useAppStore((s) => s.login);
   const navigate = useNavigate();
+
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    document.documentElement.classList.toggle('dark', next);
+    localStorage.setItem('theme', next ? 'dark' : 'light');
+  };
+
+  useEffect(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark') {
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +62,16 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 pb-12">
+    <div className="min-h-screen bg-background p-4 pb-12 relative">
+      {/* Theme Toggle */}
+      <button
+        onClick={toggleTheme}
+        className="absolute top-4 right-4 p-2.5 rounded-xl border border-border/50 bg-card hover:bg-muted transition-colors"
+        aria-label="Toggle theme"
+      >
+        {isDark ? <Sun className="w-5 h-5 text-foreground" /> : <Moon className="w-5 h-5 text-foreground" />}
+      </button>
+
       <div className="max-w-md mx-auto pt-8">
         {/* Header */}
         <div className="text-center mb-8">
