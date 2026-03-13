@@ -57,7 +57,29 @@ const AdminDashboard = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
+        <Button variant="destructive" size="sm" onClick={() => setShowResetDialog(true)} className="gap-2">
+          <RotateCcw className="w-4 h-4" /> Reset All Expenses
+        </Button>
+      </div>
+
+      <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset All Expenses</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete all expenses? This action cannot be undone. Total ₹{stats.totalExpenses.toLocaleString('en-IN')} will be cleared.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { clearAllExpenses(); toast.success('All expenses have been reset'); }}>
+              Yes, Reset All
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         {cards.map((c) => (
