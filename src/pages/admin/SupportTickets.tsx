@@ -155,9 +155,14 @@ export default function SupportTickets() {
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <h3 className="font-semibold text-sm text-foreground">{t.subject}</h3>
-                    <Badge className={`${sc.color} text-[10px] shrink-0 gap-1`}>
-                      <Icon className="w-3 h-3" /> {sc.label}
-                    </Badge>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Badge className={`${sc.color} text-[10px] gap-1`}>
+                        <Icon className="w-3 h-3" /> {sc.label}
+                      </Badge>
+                      <button onClick={(e) => handleDeleteOne(t.id, e)} className="text-muted-foreground hover:text-destructive transition-colors p-1 rounded hover:bg-destructive/10">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                   <p className="text-xs text-muted-foreground line-clamp-2 mb-3">{t.message}</p>
                   <div className="flex flex-wrap gap-3 text-[11px] text-muted-foreground">
