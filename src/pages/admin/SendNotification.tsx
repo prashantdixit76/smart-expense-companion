@@ -158,6 +158,12 @@ const SendNotification = () => {
             />
             <p className="text-xs text-muted-foreground mt-1">{message.length}/500</p>
           </div>
+          <div className="flex items-center gap-2">
+            <Checkbox id="important" checked={isImportant} onCheckedChange={(v) => setIsImportant(!!v)} />
+            <label htmlFor="important" className="text-sm font-medium text-foreground cursor-pointer flex items-center gap-1.5">
+              <AlertTriangle className="w-3.5 h-3.5 text-destructive" /> Mark as Important (shows popup to users)
+            </label>
+          </div>
           <Button onClick={handleSend} disabled={sending} className="w-full">
             {sending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
             Send to All Users
