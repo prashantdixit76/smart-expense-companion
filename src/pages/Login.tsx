@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wallet, LogIn, Phone, MessageCircle, Check, Crown, Loader2, Sparkles } from 'lucide-react';
+import { Wallet, LogIn, Check, Crown, Loader2, Sparkles, LifeBuoy } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -145,16 +145,10 @@ const Login = () => {
           </div>
         </div>
 
-        <div className="mt-8 text-center space-y-3">
-          <p className="text-sm font-medium text-muted-foreground">Need help? Contact Support</p>
-          <div className="flex items-center justify-center gap-4">
-            <a href="tel:+917668974586" className="inline-flex items-center gap-2 text-sm text-primary hover:underline font-medium">
-              <Phone className="w-4 h-4" /> +91 7668974586
-            </a>
-            <a href="https://wa.me/917668974586" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-medium text-green-600 hover:underline">
-              <MessageCircle className="w-4 h-4" /> WhatsApp
-            </a>
-          </div>
+        <div className="mt-8 text-center">
+          <Link to="/raise-ticket" className="inline-flex items-center gap-2 text-sm text-primary hover:underline font-medium">
+            <LifeBuoy className="w-4 h-4" /> Need Help? Raise a Support Ticket
+          </Link>
         </div>
       </div>
     </div>
