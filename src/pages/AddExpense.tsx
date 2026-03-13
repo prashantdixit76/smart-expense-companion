@@ -4,17 +4,16 @@ import { CATEGORIES, CATEGORY_ICONS } from '@/types/expense';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Checkbox } from '@/components/ui/checkbox';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, X, Users, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
 const AddExpense = () => {
-  const { addExpense, addCustomCategory, customCategories, users, currentUser } = useAppStore();
+  const { addExpense, addCustomCategory, customCategories, currentUser } = useAppStore();
   const allCategories = [...CATEGORIES, ...customCategories];
 
   const [form, setForm] = useState({
@@ -23,31 +22,66 @@ const AddExpense = () => {
     description: '',
     date: format(new Date(), 'yyyy-MM-dd'),
     type: 'personal' as 'personal' | 'group',
-    splitWith: [] as string[],
   });
+
+  // Group specific state
+  const [members, setMembers] = useState<string[]>([]);
+  const [newMember, setNewMember] = useState('');
+  const [paidBy, setPaidBy] = useState('Me');
+  const [myShare, setMyShare] = useState('');
+
   const [newCategory, setNewCategory] = useState('');
   const [showNewCategory, setShowNewCategory] = useState(false);
 
-  const otherUsers = users.filter((u) => u.id !== currentUser?.id && u.status === 'approved');
+  const totalAmount = parseFloat(form.amount) || 0;
+  const totalMembers = members.length + 1; // +1 for self
+  const equalShare = totalMembers > 0 ? totalAmount / totalMembers : 0;
+  const myShareAmount = myShare ? parseFloat(myShare) : equalShare;
+
+  const handleAddMember = () => {
+    const name = newMember.trim();
+    if (!name) return;
+    if (members.includes(name)) {
+      toast.error('Member already added!');
+      return;
+    }
+    setMembers([...members, name]);
+    setNewMember('');
+  };
+
+  const handleRemoveMember = (name: string) => {
+    setMembers(members.filter((m) => m !== name));
+    if (paidBy === name) setPaidBy('Me');
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const amount = parseFloat(form.amount);
     if (!amount || amount <= 0) { toast.error('Enter a valid amount.'); return; }
     if (!form.category) { toast.error('Select a category.'); return; }
+    if (form.type === 'group' && members.length === 0) {
+      toast.error('Add at least one member for group expense.');
+      return;
+    }
 
     addExpense({
       amount,
       category: form.category,
-      description: form.description,
+      description: form.type === 'group'
+        ? `${form.description} | Group: ${['Me', ...members].join(', ')} | Paid by: ${paidBy} | My share: ₹${myShareAmount.toFixed(2)}`
+        : form.description,
       date: form.date,
       paidBy: currentUser?.id || '',
-      splitWith: form.type === 'group' ? form.splitWith : [],
+      splitWith: members,
       type: form.type,
     });
 
     toast.success('Expense added!');
-    setForm({ amount: '', category: '', description: '', date: format(new Date(), 'yyyy-MM-dd'), type: 'personal', splitWith: [] });
+    setForm({ amount: '', category: '', description: '', date: format(new Date(), 'yyyy-MM-dd'), type: 'personal' });
+    setMembers([]);
+    setNewMember('');
+    setPaidBy('Me');
+    setMyShare('');
   };
 
   const handleAddCategory = () => {
@@ -60,30 +94,19 @@ const AddExpense = () => {
     }
   };
 
-  const toggleSplitUser = (userId: string) => {
-    setForm((prev) => ({
-      ...prev,
-      splitWith: prev.splitWith.includes(userId)
-        ? prev.splitWith.filter((id) => id !== userId)
-        : [...prev.splitWith, userId],
-    }));
-  };
-
-  const splitAmount = form.type === 'group' && form.splitWith.length > 0 && parseFloat(form.amount)
-    ? parseFloat(form.amount) / (form.splitWith.length + 1)
-    : 0;
-
   return (
     <div className="max-w-lg mx-auto">
       <h1 className="text-2xl font-bold text-foreground mb-6">Add Expense</h1>
       <Card className="border-border/50">
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Amount */}
             <div className="space-y-2">
               <Label>Amount (₹)</Label>
               <Input type="number" placeholder="0.00" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} required />
             </div>
 
+            {/* Category */}
             <div className="space-y-2">
               <Label>Category</Label>
               <Select value={form.category} onValueChange={(v) => { if (v === '__new__') { setShowNewCategory(true); } else { setForm({ ...form, category: v }); } }}>
@@ -105,19 +128,22 @@ const AddExpense = () => {
               )}
             </div>
 
+            {/* Description */}
             <div className="space-y-2">
               <Label>Description</Label>
               <Textarea placeholder="What was this expense for?" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} />
             </div>
 
+            {/* Date */}
             <div className="space-y-2">
               <Label>Date</Label>
               <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
             </div>
 
+            {/* Expense Type */}
             <div className="space-y-2">
               <Label>Expense Type</Label>
-              <RadioGroup value={form.type} onValueChange={(v) => setForm({ ...form, type: v as 'personal' | 'group', splitWith: [] })}>
+              <RadioGroup value={form.type} onValueChange={(v) => { setForm({ ...form, type: v as 'personal' | 'group' }); setMembers([]); setPaidBy('Me'); setMyShare(''); }}>
                 <div className="flex gap-4">
                   <div className="flex items-center gap-2">
                     <RadioGroupItem value="personal" id="personal" />
@@ -131,24 +157,81 @@ const AddExpense = () => {
               </RadioGroup>
             </div>
 
+            {/* Group Details */}
             {form.type === 'group' && (
-              <div className="space-y-2">
-                <Label>Split With</Label>
-                {otherUsers.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No other approved users to split with.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {otherUsers.map((u) => (
-                      <div key={u.id} className="flex items-center gap-2">
-                        <Checkbox checked={form.splitWith.includes(u.id)} onCheckedChange={() => toggleSplitUser(u.id)} id={u.id} />
-                        <Label htmlFor={u.id} className="font-normal">{u.fullName}</Label>
-                      </div>
+              <div className="space-y-4 p-4 rounded-lg border border-border bg-muted/30">
+                <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <Users className="w-4 h-4" />
+                  Group Details
+                </div>
+
+                {/* Add Members */}
+                <div className="space-y-2">
+                  <Label>Members</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Enter member name"
+                      value={newMember}
+                      onChange={(e) => setNewMember(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddMember(); } }}
+                    />
+                    <Button type="button" size="sm" variant="outline" onClick={handleAddMember} className="shrink-0">
+                      <UserPlus className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  {/* Member chips */}
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-primary text-primary-foreground">
+                      Me (You)
+                    </span>
+                    {members.map((m) => (
+                      <span key={m} className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-accent text-accent-foreground">
+                        {m}
+                        <button type="button" onClick={() => handleRemoveMember(m)} className="ml-1 hover:text-destructive">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
                     ))}
-                    {splitAmount > 0 && (
-                      <div className="mt-2 p-3 rounded-lg bg-accent text-accent-foreground text-sm">
-                        Each person pays: <strong>₹{splitAmount.toFixed(2)}</strong>
-                      </div>
-                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Total {totalMembers} member{totalMembers > 1 ? 's' : ''} (including you)</p>
+                </div>
+
+                {/* Who Paid */}
+                <div className="space-y-2">
+                  <Label>Who Paid?</Label>
+                  <Select value={paidBy} onValueChange={setPaidBy}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Me">Me</SelectItem>
+                      {members.map((m) => (
+                        <SelectItem key={m} value={m}>{m}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* My Share */}
+                <div className="space-y-2">
+                  <Label>My Share (₹)</Label>
+                  <Input
+                    type="number"
+                    placeholder={`Equal split: ₹${equalShare.toFixed(2)}`}
+                    value={myShare}
+                    onChange={(e) => setMyShare(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">Leave empty for equal split</p>
+                </div>
+
+                {/* Split Summary */}
+                {totalAmount > 0 && members.length > 0 && (
+                  <div className="p-3 rounded-lg bg-accent/50 space-y-1 text-sm">
+                    <p className="font-medium text-foreground">Split Summary</p>
+                    <p className="text-muted-foreground">Total: <strong className="text-foreground">₹{totalAmount.toFixed(2)}</strong></p>
+                    <p className="text-muted-foreground">Members: <strong className="text-foreground">{totalMembers}</strong></p>
+                    <p className="text-muted-foreground">Equal share each: <strong className="text-foreground">₹{equalShare.toFixed(2)}</strong></p>
+                    <p className="text-muted-foreground">Your share: <strong className="text-foreground">₹{myShareAmount.toFixed(2)}</strong></p>
+                    <p className="text-muted-foreground">Paid by: <strong className="text-foreground">{paidBy}</strong></p>
                   </div>
                 )}
               </div>
