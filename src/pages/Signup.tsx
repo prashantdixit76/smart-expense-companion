@@ -63,6 +63,15 @@ const Signup = () => {
         </div>
 
         <Card className="border-border/50 shadow-lg">
+          {selectedPlan && (
+            <div className="bg-primary/5 border-b border-border/50 px-6 py-3 flex items-center justify-between rounded-t-lg">
+              <div>
+                <p className="text-sm font-semibold text-foreground">Selected Plan: <span className="capitalize">{selectedPlan}</span></p>
+                <p className="text-xs text-muted-foreground">{selectedDuration}</p>
+              </div>
+              <Badge className="bg-primary text-primary-foreground">₹{selectedPrice}</Badge>
+            </div>
+          )}
           <CardHeader className="pb-4">
             <CardTitle className="text-xl">Sign Up</CardTitle>
             <CardDescription>Fill in your details to get started</CardDescription>
