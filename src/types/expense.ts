@@ -1,9 +1,14 @@
+export type UserRole = 'user' | 'admin' | 'super_admin';
+
 export interface User {
   id: string;
   fullName: string;
   email: string;
   phone: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'disabled';
+  role: UserRole;
+  createdAt: string;
+  lastLogin?: string;
 }
 
 export interface Expense {
@@ -33,33 +38,26 @@ export interface Settlement {
   amount: number;
 }
 
+export interface SystemLog {
+  id: string;
+  action: string;
+  userId: string;
+  userName: string;
+  details: string;
+  timestamp: string;
+}
+
 export const CATEGORIES = [
-  'Food',
-  'Rent',
-  'Travel',
-  'Shopping',
-  'Medical',
-  'Entertainment',
-  'Utilities',
-  'Recharge',
-  'Other',
+  'Food', 'Rent', 'Travel', 'Shopping', 'Medical',
+  'Entertainment', 'Utilities', 'Recharge', 'Other',
 ] as const;
 
 export const INCOME_SOURCES = [
-  'Salary',
-  'Freelance',
-  'Pocket Money',
-  'Other',
+  'Salary', 'Freelance', 'Pocket Money', 'Other',
 ] as const;
 
 export const CATEGORY_ICONS: Record<string, string> = {
-  Food: '🍔',
-  Rent: '🏠',
-  Travel: '✈️',
-  Shopping: '🛍️',
-  Medical: '🏥',
-  Entertainment: '🎬',
-  Utilities: '💡',
-  Recharge: '📱',
-  Other: '📦',
+  Food: '🍔', Rent: '🏠', Travel: '✈️', Shopping: '🛍️',
+  Medical: '🏥', Entertainment: '🎬', Utilities: '💡',
+  Recharge: '📱', Other: '📦',
 };
