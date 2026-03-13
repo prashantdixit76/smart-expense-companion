@@ -25,6 +25,8 @@ import RolesPermissions from "@/pages/admin/RolesPermissions";
 import SystemActivity from "@/pages/admin/SystemActivity";
 import AdminSettings from "@/pages/admin/AdminSettings";
 import SendNotification from "@/pages/admin/SendNotification";
+import SupportTickets from "@/pages/admin/SupportTickets";
+import RaiseTicket from "@/pages/RaiseTicket";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +52,7 @@ const App = () => (
               <Route path="/admin/roles" element={<RolesPermissions />} />
               <Route path="/admin/activity" element={<SystemActivity />} />
               <Route path="/admin/notifications" element={<SendNotification />} />
+              <Route path="/admin/tickets" element={<SupportTickets />} />
               <Route path="/admin/settings" element={<AdminSettings />} />
             </Route>
 
@@ -60,6 +63,7 @@ const App = () => (
               <Route path="/expenses" element={<Expenses />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/udhari" element={<Udhari />} />
+              <Route path="/raise-ticket" element={<RaiseTicket />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
 

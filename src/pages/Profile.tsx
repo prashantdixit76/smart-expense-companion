@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LogOut, Mail, Phone, Shield, RotateCcw, Download } from 'lucide-react';
+import { LogOut, Mail, Phone, Shield, RotateCcw, Download, TicketPlus } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -206,6 +206,15 @@ const Profile = () => {
       >
         <Download className="w-4 h-4" />
         {downloading ? 'Downloading...' : 'Download All Data (CSV)'}
+      </Button>
+
+      <Button
+        variant="outline"
+        className="w-full gap-2 h-11 rounded-xl border-primary/50 text-primary hover:bg-primary/10"
+        onClick={() => navigate('/raise-ticket')}
+      >
+        <TicketPlus className="w-4 h-4" />
+        Raise a Ticket
       </Button>
 
       <Button
