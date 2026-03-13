@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LogOut, Mail, Phone, Shield, RotateCcw, Download } from 'lucide-react';
+import { LogOut, Mail, Phone, Shield, RotateCcw, Download, TicketPlus } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
