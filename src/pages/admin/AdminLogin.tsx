@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Shield, LogIn, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { InstallButton } from '@/components/InstallButton';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
