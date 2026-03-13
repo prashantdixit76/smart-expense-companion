@@ -51,6 +51,18 @@ export default function SupportTickets() {
     },
   });
 
+  const handleDeleteOne = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const { error } = await supabase.from('support_tickets').delete().eq('id', id);
+      if (error) throw error;
+      toast.success('Ticket deleted');
+      refetch();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete');
+    }
+  };
+
   const filteredTickets = tickets?.filter((t: any) => filter === 'all' || t.status === filter) || [];
 
   const openCount = tickets?.filter((t: any) => t.status === 'open').length || 0;
