@@ -38,6 +38,7 @@ interface AppState {
   addExpense: (expense: Omit<Expense, 'id' | 'createdAt'>) => void;
   updateExpense: (id: string, data: Partial<Omit<Expense, 'id' | 'createdAt'>>) => void;
   deleteExpense: (id: string) => void;
+  clearAllExpenses: () => void;
   addIncome: (income: Omit<Income, 'id' | 'createdAt'>) => void;
   updateIncome: (id: string, data: Partial<Omit<Income, 'id' | 'createdAt'>>) => void;
   deleteIncome: (id: string) => void;
@@ -287,6 +288,7 @@ export const useAppStore = create<AppState>()(
       },
 
       deleteExpense: (id) => set({ expenses: get().expenses.filter((e) => e.id !== id) }),
+      clearAllExpenses: () => set({ expenses: [] }),
 
       addIncome: (income) => {
         const newIncome: Income = { ...income, id: crypto.randomUUID(), createdAt: new Date().toISOString() };

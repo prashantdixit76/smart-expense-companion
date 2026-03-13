@@ -1,12 +1,16 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, UserCheck, Clock, DollarSign, UsersRound } from 'lucide-react';
+import { Users, UserCheck, Clock, DollarSign, UsersRound, RotateCcw } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { format, parseISO, subDays, isAfter } from 'date-fns';
+import { Button } from '@/components/ui/button';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
 
 const AdminDashboard = () => {
-  const { users, expenses } = useAppStore();
+  const { users, expenses, clearAllExpenses } = useAppStore();
+  const [showResetDialog, setShowResetDialog] = useState(false);
 
   const stats = useMemo(() => {
     const totalUsers = users.length;
@@ -53,7 +57,29 @@ const AdminDashboard = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
+        <Button variant="destructive" size="sm" onClick={() => setShowResetDialog(true)} className="gap-2">
+          <RotateCcw className="w-4 h-4" /> Reset All Expenses
+        </Button>
+      </div>
+
+      <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset All Expenses</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete all expenses? This action cannot be undone. Total ₹{stats.totalExpenses.toLocaleString('en-IN')} will be cleared.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { clearAllExpenses(); toast.success('All expenses have been reset'); }}>
+              Yes, Reset All
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         {cards.map((c) => (
