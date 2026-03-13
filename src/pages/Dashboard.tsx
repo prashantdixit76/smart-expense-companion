@@ -1,4 +1,5 @@
 import { useMemo, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { CATEGORY_ICONS } from '@/types/expense';
