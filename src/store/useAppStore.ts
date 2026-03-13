@@ -36,13 +36,17 @@ interface AppState {
 
   // Data
   addExpense: (expense: Omit<Expense, 'id' | 'createdAt'>) => void;
+  updateExpense: (id: string, data: Partial<Omit<Expense, 'id' | 'createdAt'>>) => void;
   deleteExpense: (id: string) => void;
   addIncome: (income: Omit<Income, 'id' | 'createdAt'>) => void;
+  updateIncome: (id: string, data: Partial<Omit<Income, 'id' | 'createdAt'>>) => void;
   deleteIncome: (id: string) => void;
   addCustomCategory: (category: string) => void;
 
   // Udhari
   addUdhari: (entry: Omit<UdhariEntry, 'id' | 'createdAt' | 'settled'>) => void;
+  updateUdhari: (id: string, data: Partial<Omit<UdhariEntry, 'id' | 'createdAt'>>) => void;
+  deleteUdhari: (id: string) => void;
   settleUdhari: (id: string) => void;
 
   // Logs
