@@ -22,6 +22,7 @@ const Expenses = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [editItem, setEditItem] = useState<Expense | null>(null);
   const [editForm, setEditForm] = useState({ amount: '', category: '', description: '', date: '' });
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     return expenses
