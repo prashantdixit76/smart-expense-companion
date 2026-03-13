@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Trash2, Filter, Pencil } from 'lucide-react';
@@ -21,6 +22,7 @@ const Expenses = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [editItem, setEditItem] = useState<Expense | null>(null);
   const [editForm, setEditForm] = useState({ amount: '', category: '', description: '', date: '' });
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     return expenses
@@ -36,9 +38,8 @@ const Expenses = () => {
 
   const getUserName = (id: string) => users.find((u) => u.id === id)?.fullName || 'Unknown';
 
-  const handleDelete = (id: string) => {
-    deleteExpense(id);
-    toast.success('Expense deleted.');
+  const confirmDelete = () => {
+    if (deleteId) { deleteExpense(deleteId); toast.success('Expense deleted.'); setDeleteId(null); }
   };
 
   const openEdit = (e: Expense) => {
@@ -133,7 +134,7 @@ const Expenses = () => {
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => openEdit(e)}>
                       <Pencil className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(e.id)}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => setDeleteId(e.id)}>
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
@@ -163,6 +164,20 @@ const Expenses = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>Kya aap ye expense delete karna chahte hain? Ye action undo nahi hoga.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

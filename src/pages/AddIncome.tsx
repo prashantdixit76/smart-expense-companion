@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { ArrowDownCircle, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, parseISO } from 'date-fns';
@@ -18,6 +19,7 @@ const AddIncome = () => {
   const [form, setForm] = useState({ amount: '', source: '', description: '', date: format(new Date(), 'yyyy-MM-dd') });
   const [editItem, setEditItem] = useState<Income | null>(null);
   const [editForm, setEditForm] = useState({ amount: '', source: '', description: '', date: '' });
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,9 +45,8 @@ const AddIncome = () => {
     setEditItem(null);
   };
 
-  const handleDelete = (id: string) => {
-    deleteIncome(id);
-    toast.success('Income deleted.');
+  const confirmDelete = () => {
+    if (deleteId) { deleteIncome(deleteId); toast.success('Income deleted.'); setDeleteId(null); }
   };
 
   const sortedIncomes = [...incomes].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -98,7 +99,7 @@ const AddIncome = () => {
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => openEdit(item)}>
                       <Pencil className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(item.id)}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => setDeleteId(item.id)}>
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
@@ -128,6 +129,20 @@ const AddIncome = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>Kya aap ye income delete karna chahte hain? Ye action undo nahi hoga.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

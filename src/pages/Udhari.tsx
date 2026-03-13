@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
@@ -20,6 +21,7 @@ export default function Udhari() {
   const [filterType, setFilterType] = useState<'all' | 'given' | 'taken'>('all');
   const [editItem, setEditItem] = useState<UdhariEntry | null>(null);
   const [editForm, setEditForm] = useState({ contactName: '', phone: '', amount: '', type: 'given' as 'given' | 'taken', description: '', date: '' });
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({
     contactName: '', phone: '', amount: '', type: 'given' as 'given' | 'taken', description: '', date: new Date().toISOString().split('T')[0],
   });
@@ -58,7 +60,9 @@ export default function Udhari() {
 
   const handleSettle = (id: string) => { settleUdhari(id); toast.success('Marked as settled! ✅'); };
 
-  const handleDelete = (id: string) => { deleteUdhari(id); toast.success('Entry deleted.'); };
+  const confirmDelete = () => {
+    if (deleteId) { deleteUdhari(deleteId); toast.success('Entry deleted.'); setDeleteId(null); }
+  };
 
   const openEdit = (entry: UdhariEntry) => {
     setEditItem(entry);
@@ -168,7 +172,7 @@ export default function Udhari() {
                         <Button size="sm" variant="outline" className="gap-1 text-xs" onClick={() => handleSettle(entry.id)}><CheckCircle2 className="w-3 h-3" /> Settle</Button>
                       )}
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => openEdit(entry)}><Pencil className="w-4 h-4" /></Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(entry.id)}><Trash2 className="w-4 h-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => setDeleteId(entry.id)}><Trash2 className="w-4 h-4" /></Button>
                     </div>
                   </div>
                 ))}
@@ -196,6 +200,20 @@ export default function Udhari() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>Kya aap ye entry delete karna chahte hain? Ye action undo nahi hoga.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
