@@ -28,24 +28,8 @@ const features = [
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
   const login = useAppStore((s) => s.login);
   const navigate = useNavigate();
-
-  const toggleTheme = () => {
-    const next = !isDark;
-    setIsDark(next);
-    document.documentElement.classList.toggle('dark', next);
-    localStorage.setItem('theme', next ? 'dark' : 'light');
-  };
-
-  useEffect(() => {
-    const saved = localStorage.getItem('theme');
-    if (saved === 'dark') {
-      document.documentElement.classList.add('dark');
-      setIsDark(true);
-    }
-  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,14 +48,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-background p-4 pb-12 relative">
-      {/* Theme Toggle */}
-      <button
-        onClick={toggleTheme}
-        className="absolute top-4 right-4 p-2.5 rounded-xl border border-border/50 bg-card hover:bg-muted transition-colors"
-        aria-label="Toggle theme"
-      >
-        {isDark ? <Sun className="w-5 h-5 text-foreground" /> : <Moon className="w-5 h-5 text-foreground" />}
-      </button>
+      <ThemeToggle className="absolute top-4 right-4" />
 
       <div className="max-w-md mx-auto pt-8">
         {/* Header */}
