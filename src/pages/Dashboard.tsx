@@ -4,7 +4,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { CATEGORY_ICONS } from '@/types/expense';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrendingUp, TrendingDown, Wallet, CalendarDays, ArrowUpRight, ArrowDownRight, BarChart3, LifeBuoy } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { TrendingUp, TrendingDown, Wallet, CalendarDays, ArrowUpRight, ArrowDownRight, BarChart3, LifeBuoy, AlertTriangle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { format, startOfMonth, endOfMonth, isWithinInterval, parseISO } from 'date-fns';
 
@@ -21,6 +23,9 @@ const Dashboard = () => {
   const { profile, user } = useAuth();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [incomes, setIncomes] = useState<Income[]>([]);
+  const [importantNotifs, setImportantNotifs] = useState<any[]>([]);
+  const [showImportant, setShowImportant] = useState(false);
+  const [currentImportantIdx, setCurrentImportantIdx] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -33,7 +38,38 @@ const Dashboard = () => {
       setIncomes(incRes.data || []);
     };
     fetchData();
+
+    // Fetch unread important notifications
+    const fetchImportant = async () => {
+      const { data: unreadNotifs } = await supabase
+        .from('user_notifications')
+        .select('id, notification_id, notifications!inner(title, message, is_important)')
+        .eq('user_id', user.id)
+        .eq('read', false);
+      
+      if (unreadNotifs) {
+        const important = unreadNotifs.filter((n: any) => n.notifications?.is_important === true);
+        if (important.length > 0) {
+          setImportantNotifs(important);
+          setCurrentImportantIdx(0);
+          setShowImportant(true);
+        }
+      }
+    };
+    fetchImportant();
   }, [user]);
+
+  const handleDismissImportant = async () => {
+    const current = importantNotifs[currentImportantIdx];
+    if (current) {
+      await supabase.from('user_notifications').update({ read: true }).eq('id', current.id);
+    }
+    if (currentImportantIdx < importantNotifs.length - 1) {
+      setCurrentImportantIdx(prev => prev + 1);
+    } else {
+      setShowImportant(false);
+    }
+  };
 
   const stats = useMemo(() => {
     const now = new Date();
@@ -79,6 +115,30 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6 gradient-bg min-h-full">
+      {/* Important Notification Popup */}
+      <Dialog open={showImportant} onOpenChange={() => {}}>
+        <DialogContent className="max-w-md" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="w-5 h-5" /> Important Message
+            </DialogTitle>
+          </DialogHeader>
+          {importantNotifs[currentImportantIdx] && (
+            <div className="space-y-3">
+              <h3 className="font-bold text-foreground">{importantNotifs[currentImportantIdx].notifications?.title}</h3>
+              <p className="text-sm text-muted-foreground">{importantNotifs[currentImportantIdx].notifications?.message}</p>
+              {importantNotifs.length > 1 && (
+                <p className="text-xs text-muted-foreground">Message {currentImportantIdx + 1} of {importantNotifs.length}</p>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button onClick={handleDismissImportant} className="w-full">
+              {currentImportantIdx < importantNotifs.length - 1 ? 'OK, Next Message' : 'OK, I understand'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {/* Welcome Section */}
       <div className="animate-fade-in">
         <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">

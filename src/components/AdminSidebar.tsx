@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, UserCheck, Users, ShieldCheck, Activity, Settings, LogOut, Bell, TicketCheck
+  LayoutDashboard, UserCheck, Users, ShieldCheck, Activity, Settings, LogOut, Bell, TicketCheck, AlertTriangle
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useAppStore } from '@/store/useAppStore';
@@ -19,6 +19,7 @@ const menuItems = [
   { title: 'System Activity', url: '/admin/activity', icon: Activity },
   { title: 'Notifications', url: '/admin/notifications', icon: Bell },
   { title: 'Support Tickets', url: '/admin/tickets', icon: TicketCheck },
+  { title: 'Important Messages', url: '/admin/important', icon: AlertTriangle },
   { title: 'Settings', url: '/admin/settings', icon: Settings },
 ];
 

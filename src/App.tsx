@@ -26,6 +26,7 @@ import SystemActivity from "@/pages/admin/SystemActivity";
 import AdminSettings from "@/pages/admin/AdminSettings";
 import SendNotification from "@/pages/admin/SendNotification";
 import SupportTickets from "@/pages/admin/SupportTickets";
+import ImportantMessages from "@/pages/admin/ImportantMessages";
 import RaiseTicket from "@/pages/RaiseTicket";
 import NotFound from "@/pages/NotFound";
 
@@ -53,6 +54,7 @@ const App = () => (
               <Route path="/admin/activity" element={<SystemActivity />} />
               <Route path="/admin/notifications" element={<SendNotification />} />
               <Route path="/admin/tickets" element={<SupportTickets />} />
+              <Route path="/admin/important" element={<ImportantMessages />} />
               <Route path="/admin/settings" element={<AdminSettings />} />
             </Route>
 

@@ -1,0 +1,1 @@
+ALTER TABLE public.notifications ADD COLUMN is_important boolean DEFAULT false;
