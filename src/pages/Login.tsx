@@ -49,7 +49,10 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-background p-4 pb-12 relative">
-      <ThemeToggle className="absolute top-4 right-4" />
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        <InstallButton />
+        <ThemeToggle />
+      </div>
 
       <div className="max-w-md mx-auto pt-8">
         {/* Header */}

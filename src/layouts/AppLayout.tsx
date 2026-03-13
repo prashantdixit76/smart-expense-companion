@@ -21,7 +21,10 @@ const AppLayout = () => {
               <SidebarTrigger className="mr-3 hidden md:flex" />
               <h2 className="text-lg font-semibold text-foreground truncate">Smart Expense Tracker</h2>
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <InstallButton />
+              <ThemeToggle />
+            </div>
           </header>
           <main className="flex-1 p-4 md:p-6 pb-20 md:pb-6 overflow-auto">
             <Outlet />
