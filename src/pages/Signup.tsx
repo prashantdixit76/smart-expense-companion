@@ -9,6 +9,7 @@ import { Wallet, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { InstallButton } from '@/components/InstallButton';
 
 const Signup = () => {
   const [searchParams] = useSearchParams();
@@ -59,7 +60,10 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
-      <ThemeToggle className="absolute top-4 right-4" />
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        <InstallButton />
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-4">

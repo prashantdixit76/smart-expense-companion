@@ -4,6 +4,7 @@ import { AdminSidebar } from '@/components/AdminSidebar';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Shield } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { InstallButton } from '@/components/InstallButton';
 
 const AdminLayout = () => {
   const { adminAuthenticated } = useAppStore();
@@ -21,7 +22,10 @@ const AdminLayout = () => {
               <Shield className="w-5 h-5 text-primary" />
               <h2 className="text-lg font-semibold text-foreground">Admin Panel</h2>
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <InstallButton />
+              <ThemeToggle />
+            </div>
           </header>
           <main className="flex-1 p-4 md:p-6 overflow-auto">
             <Outlet />

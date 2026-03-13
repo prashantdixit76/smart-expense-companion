@@ -9,6 +9,7 @@ import { Wallet, LogIn, Phone, MessageCircle, Check, Crown } from 'lucide-react'
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { InstallButton } from '@/components/InstallButton';
 
 const plans = [
   { id: 'monthly', name: 'Monthly', price: 50, duration: '1 Month', perMonth: 50 },
@@ -48,7 +49,10 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-background p-4 pb-12 relative">
-      <ThemeToggle className="absolute top-4 right-4" />
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        <InstallButton />
+        <ThemeToggle />
+      </div>
 
       <div className="max-w-md mx-auto pt-8">
         {/* Header */}
