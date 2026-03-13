@@ -53,7 +53,7 @@ const SendNotification = () => {
     try {
       const { data: notif, error: notifErr } = await supabase
         .from('notifications')
-        .insert({ title: title.trim(), message: message.trim(), sent_by: user.id })
+        .insert({ title: title.trim(), message: message.trim(), sent_by: user.id, is_important: isImportant } as any)
         .select()
         .single();
 
