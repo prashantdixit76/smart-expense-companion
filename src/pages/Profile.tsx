@@ -72,7 +72,7 @@ const Profile = () => {
         csv += `${i.date},${i.source},"${i.description || ''}",₹${i.amount}\n`;
       });
 
-      csv += '\n=== UDHARI (Lending/Borrowing) ===\n';
+      csv += '\n=== ACCOUNTS (Lending/Borrowing) ===\n';
       csv += 'Date,Contact,Type,Description,Amount,Settled\n';
       udhari.forEach(u => {
         csv += `${u.date},"${u.contact_name}",${u.type === 'given' ? 'Given' : 'Taken'},"${u.description || ''}",₹${u.amount},${u.settled ? 'Yes' : 'No'}\n`;
