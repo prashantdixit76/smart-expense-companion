@@ -6,21 +6,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Trash2, Filter } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Trash2, Filter, Pencil } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { toast } from 'sonner';
+import type { Expense } from '@/types/expense';
 
 const Expenses = () => {
-  const { expenses, deleteExpense, users, customCategories } = useAppStore();
+  const { expenses, deleteExpense, updateExpense, users, customCategories } = useAppStore();
   const allCategories = [...CATEGORIES, ...customCategories];
 
-  const [filters, setFilters] = useState({
-    category: 'all',
-    type: 'all',
-    dateFrom: '',
-    dateTo: '',
-  });
+  const [filters, setFilters] = useState({ category: 'all', type: 'all', dateFrom: '', dateTo: '' });
   const [showFilters, setShowFilters] = useState(false);
+  const [editItem, setEditItem] = useState<Expense | null>(null);
+  const [editForm, setEditForm] = useState({ amount: '', category: '', description: '', date: '' });
 
   const filtered = useMemo(() => {
     return expenses
@@ -39,6 +39,20 @@ const Expenses = () => {
   const handleDelete = (id: string) => {
     deleteExpense(id);
     toast.success('Expense deleted.');
+  };
+
+  const openEdit = (e: Expense) => {
+    setEditItem(e);
+    setEditForm({ amount: String(e.amount), category: e.category, description: e.description, date: e.date });
+  };
+
+  const handleUpdate = () => {
+    if (!editItem) return;
+    const amount = parseFloat(editForm.amount);
+    if (!amount || amount <= 0) { toast.error('Enter valid amount'); return; }
+    updateExpense(editItem.id, { amount, category: editForm.category, description: editForm.description, date: editForm.date });
+    toast.success('Expense updated!');
+    setEditItem(null);
   };
 
   return (
@@ -114,8 +128,11 @@ const Expenses = () => {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-base font-bold text-expense">-₹{e.amount.toLocaleString('en-IN')}</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-base font-bold text-expense mr-1">-₹{e.amount.toLocaleString('en-IN')}</span>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => openEdit(e)}>
+                      <Pencil className="w-4 h-4" />
+                    </Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(e.id)}>
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -126,6 +143,26 @@ const Expenses = () => {
           ))}
         </div>
       )}
+
+      {/* Edit Dialog */}
+      <Dialog open={!!editItem} onOpenChange={(open) => !open && setEditItem(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Edit Expense</DialogTitle></DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div><Label>Amount (₹)</Label><Input type="number" value={editForm.amount} onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })} /></div>
+            <div>
+              <Label>Category</Label>
+              <Select value={editForm.category} onValueChange={(v) => setEditForm({ ...editForm, category: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{allCategories.map((c) => <SelectItem key={c} value={c}>{CATEGORY_ICONS[c] || '📦'} {c}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div><Label>Description</Label><Textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} rows={2} /></div>
+            <div><Label>Date</Label><Input type="date" value={editForm.date} onChange={(e) => setEditForm({ ...editForm, date: e.target.value })} /></div>
+            <Button className="w-full" onClick={handleUpdate}>Save Changes</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
