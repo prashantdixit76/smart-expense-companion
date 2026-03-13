@@ -76,11 +76,6 @@ const Login = () => {
                 Sign up
               </Link>
             </p>
-            <div className="mt-4 p-3 rounded-lg bg-muted text-xs text-muted-foreground">
-              <p className="font-medium mb-1">Demo admin login:</p>
-              <p>Email: admin@expense.com</p>
-              <p>Password: admin123</p>
-            </div>
           </CardContent>
         </Card>
       </div>
