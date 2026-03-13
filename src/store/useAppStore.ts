@@ -282,11 +282,19 @@ export const useAppStore = create<AppState>()(
         set({ expenses: [...get().expenses, newExpense] });
       },
 
+      updateExpense: (id, data) => {
+        set({ expenses: get().expenses.map(e => e.id === id ? { ...e, ...data } : e) });
+      },
+
       deleteExpense: (id) => set({ expenses: get().expenses.filter((e) => e.id !== id) }),
 
       addIncome: (income) => {
         const newIncome: Income = { ...income, id: crypto.randomUUID(), createdAt: new Date().toISOString() };
         set({ incomes: [...get().incomes, newIncome] });
+      },
+
+      updateIncome: (id, data) => {
+        set({ incomes: get().incomes.map(i => i.id === id ? { ...i, ...data } : i) });
       },
 
       deleteIncome: (id) => set({ incomes: get().incomes.filter((i) => i.id !== id) }),
@@ -304,6 +312,14 @@ export const useAppStore = create<AppState>()(
           createdAt: new Date().toISOString(),
         };
         set({ udhpiEntries: [...get().udhpiEntries, newEntry] });
+      },
+
+      updateUdhari: (id, data) => {
+        set({ udhpiEntries: get().udhpiEntries.map(e => e.id === id ? { ...e, ...data } : e) });
+      },
+
+      deleteUdhari: (id) => {
+        set({ udhpiEntries: get().udhpiEntries.filter(e => e.id !== id) });
       },
 
       settleUdhari: (id) => {
