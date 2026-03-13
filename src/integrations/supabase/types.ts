@@ -161,6 +161,7 @@ export type Database = {
           message: string
           name: string
           phone: string | null
+          source: string | null
           status: string
           subject: string
           updated_at: string
@@ -174,6 +175,7 @@ export type Database = {
           message: string
           name: string
           phone?: string | null
+          source?: string | null
           status?: string
           subject: string
           updated_at?: string
@@ -187,6 +189,7 @@ export type Database = {
           message?: string
           name?: string
           phone?: string | null
+          source?: string | null
           status?: string
           subject?: string
           updated_at?: string

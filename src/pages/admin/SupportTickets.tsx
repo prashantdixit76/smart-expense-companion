@@ -113,6 +113,11 @@ export default function SupportTickets() {
                     <span className="flex items-center gap-1"><User className="w-3 h-3" /> {t.name}</span>
                     <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {t.email}</span>
                     {t.phone && <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {t.phone}</span>}
+                    {(t as any).source && (
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                        {(t as any).source === 'login_page' ? '📍 Login Page' : '📍 Dashboard'}
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-[10px] text-muted-foreground mt-2">
                     {new Date(t.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
@@ -141,10 +146,11 @@ export default function SupportTickets() {
                 <p className="text-xs font-medium text-muted-foreground">Message</p>
                 <p className="text-sm">{selectedTicket.message}</p>
               </div>
-              <div className="grid grid-cols-3 gap-2 text-xs">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                 <div><p className="text-muted-foreground">Name</p><p className="font-medium">{selectedTicket.name}</p></div>
                 <div><p className="text-muted-foreground">Email</p><p className="font-medium">{selectedTicket.email}</p></div>
                 <div><p className="text-muted-foreground">Phone</p><p className="font-medium">{selectedTicket.phone || '-'}</p></div>
+                <div><p className="text-muted-foreground">Source</p><p className="font-medium">{(selectedTicket as any).source === 'login_page' ? '📍 Login Page' : '📍 Dashboard'}</p></div>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">Status</label>

@@ -5,9 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wallet, LogIn, Check, Crown, Loader2, Sparkles, LifeBuoy } from 'lucide-react';
+import { Wallet, LogIn, Check, Crown, Loader2, Sparkles, LifeBuoy, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { supabase } from '@/integrations/supabase/client';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { InstallButton } from '@/components/InstallButton';
 
@@ -25,6 +28,91 @@ const features = [
   'Reports & Analytics',
   'Multi-device Access',
 ];
+
+function LoginTicketDialog() {
+  const [open, setOpen] = useState(false);
+  const [tName, setTName] = useState('');
+  const [tEmail, setTEmail] = useState('');
+  const [tPhone, setTPhone] = useState('');
+  const [tSubject, setTSubject] = useState('');
+  const [tMessage, setTMessage] = useState('');
+  const [tSubmitting, setTSubmitting] = useState(false);
+
+  const handleTicketSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tName.trim() || !tEmail.trim() || !tSubject.trim() || !tMessage.trim()) {
+      toast.error('Please fill all required fields');
+      return;
+    }
+    setTSubmitting(true);
+    try {
+      const { error } = await supabase.from('support_tickets').insert({
+        user_id: '00000000-0000-0000-0000-000000000000',
+        name: tName.trim(),
+        email: tEmail.trim(),
+        phone: tPhone.trim() || null,
+        subject: tSubject.trim(),
+        message: tMessage.trim(),
+        source: 'login_page',
+      } as any);
+      if (error) throw error;
+      toast.success('Ticket submitted! Admin will contact you soon.');
+      setTName(''); setTEmail(''); setTPhone(''); setTSubject(''); setTMessage('');
+      setOpen(false);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to submit ticket');
+    } finally {
+      setTSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="mt-8 text-center">
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <button className="inline-flex items-center gap-2 text-sm text-primary hover:underline font-medium">
+            <LifeBuoy className="w-4 h-4" /> Need Help? Raise a Support Ticket
+          </button>
+        </DialogTrigger>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <LifeBuoy className="w-4 h-4 text-primary" /> Raise a Support Ticket
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleTicketSubmit} className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">Name *</label>
+                <Input value={tName} onChange={e => setTName(e.target.value)} placeholder="Your name" maxLength={100} />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">Email *</label>
+                <Input type="email" value={tEmail} onChange={e => setTEmail(e.target.value)} placeholder="Your email" maxLength={255} />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Phone</label>
+              <Input value={tPhone} onChange={e => setTPhone(e.target.value)} placeholder="Phone (optional)" maxLength={20} />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Subject *</label>
+              <Input value={tSubject} onChange={e => setTSubject(e.target.value)} placeholder="Brief subject" maxLength={200} />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Describe your issue *</label>
+              <Textarea value={tMessage} onChange={e => setTMessage(e.target.value)} placeholder="Explain your problem..." rows={3} maxLength={2000} />
+            </div>
+            <Button type="submit" disabled={tSubmitting} className="w-full gap-2">
+              <Send className="w-4 h-4" />
+              {tSubmitting ? 'Submitting...' : 'Submit Ticket'}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -145,11 +233,7 @@ const Login = () => {
           </div>
         </div>
 
-        <div className="mt-8 text-center">
-          <Link to="/raise-ticket" className="inline-flex items-center gap-2 text-sm text-primary hover:underline font-medium">
-            <LifeBuoy className="w-4 h-4" /> Need Help? Raise a Support Ticket
-          </Link>
-        </div>
+        <LoginTicketDialog />
       </div>
     </div>
   );
