@@ -9,6 +9,9 @@ export interface User {
   role: UserRole;
   createdAt: string;
   lastLogin?: string;
+  selectedPlan?: string;
+  planPrice?: number;
+  planDuration?: string;
 }
 
 export interface Expense {
