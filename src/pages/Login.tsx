@@ -62,7 +62,16 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 pb-12">
+    <div className="min-h-screen bg-background p-4 pb-12 relative">
+      {/* Theme Toggle */}
+      <button
+        onClick={toggleTheme}
+        className="absolute top-4 right-4 p-2.5 rounded-xl border border-border/50 bg-card hover:bg-muted transition-colors"
+        aria-label="Toggle theme"
+      >
+        {isDark ? <Sun className="w-5 h-5 text-foreground" /> : <Moon className="w-5 h-5 text-foreground" />}
+      </button>
+
       <div className="max-w-md mx-auto pt-8">
         {/* Header */}
         <div className="text-center mb-8">
