@@ -13,6 +13,7 @@ import AddIncome from "@/pages/AddIncome";
 import Expenses from "@/pages/Expenses";
 import Reports from "@/pages/Reports";
 import Profile from "@/pages/Profile";
+import Udhari from "@/pages/Udhari";
 import AdminLogin from "@/pages/admin/AdminLogin";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import SignupRequests from "@/pages/admin/SignupRequests";
