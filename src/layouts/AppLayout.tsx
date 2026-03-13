@@ -38,6 +38,7 @@ const AppLayout = () => {
               <h2 className="text-base font-bold text-foreground truncate">Smart Expense Tracker</h2>
             </div>
             <div className="flex items-center gap-2">
+              <NotificationBell />
               <InstallButton />
               <ThemeToggle />
             </div>
