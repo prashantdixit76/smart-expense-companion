@@ -1,16 +1,65 @@
+import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LogOut, User, Mail, Phone, Shield } from 'lucide-react';
+import { LogOut, User, Mail, Phone, Shield, RotateCcw } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { toast } from '@/hooks/use-toast';
+import { startOfMonth, endOfMonth, format } from 'date-fns';
 
 const Profile = () => {
-  const { profile, signOut } = useAuth();
+  const { profile, user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [showFirstConfirm, setShowFirstConfirm] = useState(false);
+  const [showSecondConfirm, setShowSecondConfirm] = useState(false);
+  const [resetting, setResetting] = useState(false);
 
   const handleLogout = async () => {
     await signOut();
     navigate('/login');
+  };
+
+  const handleResetMonth = () => {
+    setShowFirstConfirm(true);
+  };
+
+  const handleFirstConfirm = () => {
+    setShowFirstConfirm(false);
+    setShowSecondConfirm(true);
+  };
+
+  const handleFinalReset = async () => {
+    if (!user) return;
+    setResetting(true);
+    setShowSecondConfirm(false);
+
+    const now = new Date();
+    const monthStart = format(startOfMonth(now), 'yyyy-MM-dd');
+    const monthEnd = format(endOfMonth(now), 'yyyy-MM-dd');
+
+    const [expRes, incRes] = await Promise.all([
+      supabase.from('expenses').delete().eq('user_id', user.id).gte('date', monthStart).lte('date', monthEnd),
+      supabase.from('incomes').delete().eq('user_id', user.id).gte('date', monthStart).lte('date', monthEnd),
+    ]);
+
+    setResetting(false);
+
+    if (expRes.error || incRes.error) {
+      toast({ title: 'Error', description: 'Failed to reset current month data.', variant: 'destructive' });
+    } else {
+      toast({ title: 'Reset Complete', description: 'All expenses and incomes for the current month have been deleted.' });
+    }
   };
 
   return (
@@ -18,7 +67,6 @@ const Profile = () => {
       <h1 className="text-2xl font-extrabold text-foreground tracking-tight animate-fade-in">Profile</h1>
 
       <Card className="glass-card rounded-2xl overflow-hidden animate-fade-in">
-        {/* Profile Header with Gradient */}
         <div className="gradient-primary p-6 pb-12 relative">
           <div className="absolute inset-0 bg-black/5" />
         </div>
@@ -58,10 +106,56 @@ const Profile = () => {
         </CardContent>
       </Card>
 
+      <Button
+        variant="outline"
+        className="w-full gap-2 h-11 rounded-xl border-destructive/50 text-destructive hover:bg-destructive/10"
+        onClick={handleResetMonth}
+        disabled={resetting}
+      >
+        <RotateCcw className="w-4 h-4" />
+        {resetting ? 'Resetting...' : 'Reset Current Month'}
+      </Button>
+
       <Button variant="destructive" className="w-full gap-2 h-11 rounded-xl shadow-md" onClick={handleLogout}>
         <LogOut className="w-4 h-4" />
         Logout
       </Button>
+
+      {/* First Confirmation */}
+      <AlertDialog open={showFirstConfirm} onOpenChange={setShowFirstConfirm}>
+        <AlertDialogContent className="glass-card rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete all your expenses and incomes for the current month. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleFirstConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl">
+              Yes, Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Second Confirmation */}
+      <AlertDialog open={showSecondConfirm} onOpenChange={setShowSecondConfirm}>
+        <AlertDialogContent className="glass-card rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you really sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will not be recoverable. All your expense and income records for this month will be permanently erased. There is no way to undo this.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleFinalReset} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl">
+              Yes, Reset Everything
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
