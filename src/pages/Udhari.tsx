@@ -172,7 +172,7 @@ export default function Udhari() {
                         <Button size="sm" variant="outline" className="gap-1 text-xs" onClick={() => handleSettle(entry.id)}><CheckCircle2 className="w-3 h-3" /> Settle</Button>
                       )}
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => openEdit(entry)}><Pencil className="w-4 h-4" /></Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(entry.id)}><Trash2 className="w-4 h-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => setDeleteId(entry.id)}><Trash2 className="w-4 h-4" /></Button>
                     </div>
                   </div>
                 ))}
