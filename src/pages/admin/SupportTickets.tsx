@@ -23,6 +23,21 @@ export default function SupportTickets() {
   const [newStatus, setNewStatus] = useState('');
   const [saving, setSaving] = useState(false);
   const [filter, setFilter] = useState('all');
+  const [deleting, setDeleting] = useState(false);
+
+  const handleClearAll = async () => {
+    setDeleting(true);
+    try {
+      const { error } = await supabase.from('support_tickets').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      if (error) throw error;
+      toast.success('All tickets cleared!');
+      refetch();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to clear tickets');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const { data: tickets, refetch } = useQuery({
     queryKey: ['admin-tickets'],
