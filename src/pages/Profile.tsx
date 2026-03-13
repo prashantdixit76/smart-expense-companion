@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LogOut, User, Mail, Phone, Shield, RotateCcw } from 'lucide-react';
+import { LogOut, Mail, Phone, Shield, RotateCcw } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,8 +15,26 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { toast } from '@/hooks/use-toast';
 import { startOfMonth, endOfMonth, format } from 'date-fns';
+
+const AVATAR_EMOJIS = [
+  // Boys / Men
+  '👦', '👨', '🧑', '👨‍💼', '👨‍💻', '🧔', '👨‍🎓', '🤴', '🦸‍♂️', '🧑‍🚀',
+  '👨‍🍳', '👨‍🔧', '🧑‍💻', '👨‍🎤', '🕺', '🧑‍🎨',
+  // Girls / Women
+  '👧', '👩', '🧑‍🦰', '👩‍💼', '👩‍💻', '👩‍🎓', '👸', '🦸‍♀️', '🧕',
+  '👩‍🍳', '👩‍🔧', '💃', '👩‍🎤', '🧑‍🦱', '👩‍🎨', '🧑‍⚕️',
+  // Neutral / Fun
+  '😎', '🤓', '🥷', '🧙', '🧛', '🦊', '🐱', '🐶', '🦁', '🐼',
+  '🦄', '🐸', '🐵', '🦋', '🌸', '⭐',
+];
 
 const Profile = () => {
   const { profile, user, signOut } = useAuth();
@@ -24,6 +42,14 @@ const Profile = () => {
   const [showFirstConfirm, setShowFirstConfirm] = useState(false);
   const [showSecondConfirm, setShowSecondConfirm] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [avatar, setAvatar] = useState(() => localStorage.getItem('profile_avatar') || '😎');
+
+  const handleSelectAvatar = (emoji: string) => {
+    setAvatar(emoji);
+    localStorage.setItem('profile_avatar', emoji);
+    setShowEmojiPicker(false);
+  };
 
   const handleLogout = async () => {
     await signOut();
@@ -72,9 +98,13 @@ const Profile = () => {
         </div>
         <CardContent className="pt-0 -mt-8 relative z-10">
           <div className="flex items-end gap-4 mb-6">
-            <div className="w-20 h-20 rounded-2xl bg-card border-4 border-card shadow-lg flex items-center justify-center">
-              <User className="w-9 h-9 text-primary" />
-            </div>
+            <button
+              onClick={() => setShowEmojiPicker(true)}
+              className="w-20 h-20 rounded-2xl bg-card border-4 border-card shadow-lg flex items-center justify-center text-4xl hover:scale-105 transition-transform duration-200 cursor-pointer relative group"
+            >
+              {avatar}
+              <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md">✏️</span>
+            </button>
             <div className="pb-1">
               <p className="font-extrabold text-foreground text-xl">{profile?.full_name}</p>
               <p className="text-xs text-muted-foreground capitalize flex items-center gap-1">
@@ -121,9 +151,33 @@ const Profile = () => {
         Logout
       </Button>
 
+      {/* Emoji Avatar Picker */}
+      <Dialog open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
+        <DialogContent className="glass-card rounded-2xl max-w-[calc(100vw-2rem)] sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-center">Choose Your Avatar</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-8 gap-2 py-3 max-h-[300px] overflow-y-auto">
+            {AVATAR_EMOJIS.map((emoji) => (
+              <button
+                key={emoji}
+                onClick={() => handleSelectAvatar(emoji)}
+                className={`w-10 h-10 rounded-xl flex items-center justify-center text-2xl hover:scale-110 transition-all duration-200 ${
+                  avatar === emoji
+                    ? 'bg-primary/20 ring-2 ring-primary scale-110'
+                    : 'hover:bg-muted/80'
+                }`}
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* First Confirmation */}
       <AlertDialog open={showFirstConfirm} onOpenChange={setShowFirstConfirm}>
-        <AlertDialogContent className="glass-card rounded-2xl">
+        <AlertDialogContent className="glass-card rounded-2xl max-w-[calc(100vw-2rem)] sm:max-w-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -141,7 +195,7 @@ const Profile = () => {
 
       {/* Second Confirmation */}
       <AlertDialog open={showSecondConfirm} onOpenChange={setShowSecondConfirm}>
-        <AlertDialogContent className="glass-card rounded-2xl">
+        <AlertDialogContent className="glass-card rounded-2xl max-w-[calc(100vw-2rem)] sm:max-w-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>Are you really sure?</AlertDialogTitle>
             <AlertDialogDescription>
