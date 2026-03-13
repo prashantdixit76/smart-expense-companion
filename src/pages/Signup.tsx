@@ -10,6 +10,11 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 
 const Signup = () => {
+  const [searchParams] = useSearchParams();
+  const selectedPlan = searchParams.get('plan');
+  const selectedPrice = searchParams.get('price');
+  const selectedDuration = searchParams.get('duration');
+
   const [form, setForm] = useState({
     fullName: '',
     email: '',
