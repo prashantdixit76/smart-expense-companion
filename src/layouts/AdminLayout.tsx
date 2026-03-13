@@ -1,15 +1,21 @@
 import { Outlet, Navigate } from 'react-router-dom';
-import { useAppStore } from '@/store/useAppStore';
+import { useAuth } from '@/hooks/useAuth';
 import { AdminSidebar } from '@/components/AdminSidebar';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { Shield } from 'lucide-react';
+import { Shield, Loader2 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { InstallButton } from '@/components/InstallButton';
 
 const AdminLayout = () => {
-  const { adminAuthenticated } = useAppStore();
+  const { isAdmin, loading, session } = useAuth();
 
-  if (!adminAuthenticated) return <Navigate to="/admin" replace />;
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+    </div>
+  );
+
+  if (!session || !isAdmin) return <Navigate to="/admin" replace />;
 
   return (
     <SidebarProvider>

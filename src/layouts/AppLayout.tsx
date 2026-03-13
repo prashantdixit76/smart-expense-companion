@@ -1,13 +1,20 @@
 import { Outlet, Navigate } from 'react-router-dom';
-import { useAppStore } from '@/store/useAppStore';
+import { useAuth } from '@/hooks/useAuth';
 import { AppSidebar } from '@/components/AppSidebar';
 import { BottomNav } from '@/components/BottomNav';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { InstallButton } from '@/components/InstallButton';
+import { Loader2 } from 'lucide-react';
 
 const AppLayout = () => {
-  const { isAuthenticated } = useAppStore();
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+    </div>
+  );
 
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 

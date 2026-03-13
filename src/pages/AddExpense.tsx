@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useAppStore } from '@/store/useAppStore';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { CATEGORIES, CATEGORY_ICONS } from '@/types/expense';
-import { saveOfflineExpense } from '@/lib/offlineDb';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,8 +14,8 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 
 const AddExpense = () => {
-  const { addExpense, addCustomCategory, customCategories, currentUser } = useAppStore();
-  const allCategories = [...CATEGORIES, ...customCategories];
+  const { user } = useAuth();
+  const allCategories = [...CATEGORIES];
 
   const [form, setForm] = useState({
     amount: '',
@@ -25,16 +25,12 @@ const AddExpense = () => {
     type: 'personal' as 'personal' | 'group',
   });
 
-  // Group specific state
   const [members, setMembers] = useState<string[]>([]);
   const [newMember, setNewMember] = useState('');
-  const [memberShares, setMemberShares] = useState<Record<string, string>>({}); // each member's paid amount
-
-  const [newCategory, setNewCategory] = useState('');
-  const [showNewCategory, setShowNewCategory] = useState(false);
+  const [memberShares, setMemberShares] = useState<Record<string, string>>({});
 
   const totalAmount = parseFloat(form.amount) || 0;
-  const totalMembers = members.length + 1; // +1 for self
+  const totalMembers = members.length + 1;
   const equalShare = totalMembers > 0 ? totalAmount / totalMembers : 0;
 
   const getMemberShare = (name: string) => {
@@ -46,10 +42,7 @@ const AddExpense = () => {
   const handleAddMember = () => {
     const name = newMember.trim();
     if (!name) return;
-    if (members.includes(name)) {
-      toast.error('Member already added!');
-      return;
-    }
+    if (members.includes(name)) { toast.error('Member already added!'); return; }
     setMembers([...members, name]);
     setNewMember('');
   };
@@ -61,63 +54,31 @@ const AddExpense = () => {
     setMemberShares(newShares);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
     const amount = parseFloat(form.amount);
     if (!amount || amount <= 0) { toast.error('Enter a valid amount.'); return; }
     if (!form.category) { toast.error('Select a category.'); return; }
-    if (form.type === 'group' && members.length === 0) {
-      toast.error('Add at least one member for group expense.');
-      return;
-    }
+    if (form.type === 'group' && members.length === 0) { toast.error('Add at least one member for group expense.'); return; }
 
     const sharesDetail = ['Me', ...members].map(m => `${m}: ₹${getMemberShare(m).toFixed(2)}`).join(', ');
 
-    if (!navigator.onLine) {
-      // Save offline
-      saveOfflineExpense({
-        id: crypto.randomUUID(),
-        amount,
-        category: form.category,
-        description: form.type === 'group'
-          ? `${form.description} | Group: ${['Me', ...members].join(', ')} | Shares: ${sharesDetail}`
-          : form.description,
-        date: form.date,
-        paidBy: currentUser?.id || '',
-        splitWith: members,
-        type: form.type,
-        createdAt: new Date().toISOString(),
-      });
-      toast.success('Expense saved offline! Will sync when online.');
-    } else {
-      addExpense({
-        amount,
-        category: form.category,
-        description: form.type === 'group'
-          ? `${form.description} | Group: ${['Me', ...members].join(', ')} | Shares: ${sharesDetail}`
-          : form.description,
-        date: form.date,
-        paidBy: currentUser?.id || '',
-        splitWith: members,
-        type: form.type,
-      });
-      toast.success('Expense added!');
-    }
+    const { error } = await supabase.from('expenses').insert({
+      user_id: user.id,
+      amount,
+      category: form.category,
+      description: form.type === 'group' ? `${form.description} | Group: ${['Me', ...members].join(', ')} | Shares: ${sharesDetail}` : form.description,
+      date: form.date,
+      paid_by: user.id,
+      split_with: members,
+      type: form.type,
+    });
 
+    if (error) { toast.error('Failed to add expense.'); return; }
+    toast.success('Expense added!');
     setForm({ amount: '', category: '', description: '', date: format(new Date(), 'yyyy-MM-dd'), type: 'personal' });
-    setMembers([]);
-    setNewMember('');
-    setMemberShares({});
-  };
-
-  const handleAddCategory = () => {
-    if (newCategory.trim()) {
-      addCustomCategory(newCategory.trim());
-      setForm({ ...form, category: newCategory.trim() });
-      setNewCategory('');
-      setShowNewCategory(false);
-      toast.success('Category added!');
-    }
+    setMembers([]); setNewMember(''); setMemberShares({});
   };
 
   return (
@@ -126,160 +87,79 @@ const AddExpense = () => {
       <Card className="border-border/50">
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Amount */}
             <div className="space-y-2">
               <Label>Amount (₹)</Label>
               <Input type="number" placeholder="0.00" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} required />
             </div>
-
-            {/* Category */}
             <div className="space-y-2">
               <Label>Category</Label>
-              <Select value={form.category} onValueChange={(v) => { if (v === '__new__') { setShowNewCategory(true); } else { setForm({ ...form, category: v }); } }}>
+              <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
                 <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
                 <SelectContent>
-                  {allCategories.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {CATEGORY_ICONS[c] || '📦'} {c}
-                    </SelectItem>
-                  ))}
-                  <SelectItem value="__new__">➕ Add Custom Category</SelectItem>
+                  {allCategories.map((c) => <SelectItem key={c} value={c}>{CATEGORY_ICONS[c] || '📦'} {c}</SelectItem>)}
                 </SelectContent>
               </Select>
-              {showNewCategory && (
-                <div className="flex gap-2 mt-2">
-                  <Input placeholder="New category name" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} />
-                  <Button type="button" size="sm" onClick={handleAddCategory}>Add</Button>
-                </div>
-              )}
             </div>
-
-            {/* Description */}
             <div className="space-y-2">
               <Label>Description</Label>
               <Textarea placeholder="What was this expense for?" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} />
             </div>
-
-            {/* Date */}
             <div className="space-y-2">
               <Label>Date</Label>
               <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
             </div>
-
-            {/* Expense Type */}
             <div className="space-y-2">
               <Label>Expense Type</Label>
               <RadioGroup value={form.type} onValueChange={(v) => { setForm({ ...form, type: v as 'personal' | 'group' }); setMembers([]); setMemberShares({}); }}>
                 <div className="flex gap-4">
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="personal" id="personal" />
-                    <Label htmlFor="personal" className="font-normal">Personal</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="group" id="group" />
-                    <Label htmlFor="group" className="font-normal">Group</Label>
-                  </div>
+                  <div className="flex items-center gap-2"><RadioGroupItem value="personal" id="personal" /><Label htmlFor="personal" className="font-normal">Personal</Label></div>
+                  <div className="flex items-center gap-2"><RadioGroupItem value="group" id="group" /><Label htmlFor="group" className="font-normal">Group</Label></div>
                 </div>
               </RadioGroup>
             </div>
 
-            {/* Group Details */}
             {form.type === 'group' && (
               <div className="space-y-4 p-4 rounded-lg border border-border bg-muted/30">
-                <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                  <Users className="w-4 h-4" />
-                  Group Details
-                </div>
-
-                {/* Add Members */}
+                <div className="flex items-center gap-2 text-sm font-semibold text-foreground"><Users className="w-4 h-4" /> Group Details</div>
                 <div className="space-y-2">
                   <Label>Members</Label>
                   <div className="flex gap-2">
-                    <Input
-                      placeholder="Enter member name"
-                      value={newMember}
-                      onChange={(e) => setNewMember(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddMember(); } }}
-                    />
-                    <Button type="button" size="sm" variant="outline" onClick={handleAddMember} className="shrink-0">
-                      <UserPlus className="w-4 h-4" />
-                    </Button>
+                    <Input placeholder="Enter member name" value={newMember} onChange={(e) => setNewMember(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddMember(); } }} />
+                    <Button type="button" size="sm" variant="outline" onClick={handleAddMember} className="shrink-0"><UserPlus className="w-4 h-4" /></Button>
                   </div>
-
-                  {/* Member chips */}
                   <div className="flex flex-wrap gap-2 mt-2">
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-primary text-primary-foreground">
-                      Me (You)
-                    </span>
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-primary text-primary-foreground">Me (You)</span>
                     {members.map((m) => (
                       <span key={m} className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-accent text-accent-foreground">
-                        {m}
-                        <button type="button" onClick={() => handleRemoveMember(m)} className="ml-1 hover:text-destructive">
-                          <X className="w-3 h-3" />
-                        </button>
+                        {m}<button type="button" onClick={() => handleRemoveMember(m)} className="ml-1 hover:text-destructive"><X className="w-3 h-3" /></button>
                       </span>
                     ))}
                   </div>
                   <p className="text-xs text-muted-foreground">Total {totalMembers} member{totalMembers > 1 ? 's' : ''} (including you)</p>
                 </div>
-
-                {/* Per-member shares */}
                 {members.length > 0 && (
                   <div className="space-y-3">
                     <Label>Each Member's Share (₹)</Label>
                     <p className="text-xs text-muted-foreground">Leave empty for equal split (₹{equalShare.toFixed(2)} each)</p>
-                    
-                    {/* Me */}
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-medium text-foreground w-24 truncate">Me (You)</span>
-                      <Input
-                        type="number"
-                        placeholder={`₹${equalShare.toFixed(2)}`}
-                        value={memberShares['Me'] || ''}
-                        onChange={(e) => setMemberShares({ ...memberShares, Me: e.target.value })}
-                        className="flex-1"
-                      />
-                    </div>
-
-                    {/* Other members */}
+                    <div className="flex items-center gap-3"><span className="text-sm font-medium text-foreground w-24 truncate">Me (You)</span><Input type="number" placeholder={`₹${equalShare.toFixed(2)}`} value={memberShares['Me'] || ''} onChange={(e) => setMemberShares({ ...memberShares, Me: e.target.value })} className="flex-1" /></div>
                     {members.map((m) => (
-                      <div key={m} className="flex items-center gap-3">
-                        <span className="text-sm font-medium text-foreground w-24 truncate">{m}</span>
-                        <Input
-                          type="number"
-                          placeholder={`₹${equalShare.toFixed(2)}`}
-                          value={memberShares[m] || ''}
-                          onChange={(e) => setMemberShares({ ...memberShares, [m]: e.target.value })}
-                          className="flex-1"
-                        />
-                      </div>
+                      <div key={m} className="flex items-center gap-3"><span className="text-sm font-medium text-foreground w-24 truncate">{m}</span><Input type="number" placeholder={`₹${equalShare.toFixed(2)}`} value={memberShares[m] || ''} onChange={(e) => setMemberShares({ ...memberShares, [m]: e.target.value })} className="flex-1" /></div>
                     ))}
                   </div>
                 )}
-
-                {/* Split Summary */}
                 {totalAmount > 0 && members.length > 0 && (
                   <div className="p-3 rounded-lg bg-accent/50 space-y-1 text-sm">
                     <p className="font-medium text-foreground">Split Summary</p>
                     <p className="text-muted-foreground">Total: <strong className="text-foreground">₹{totalAmount.toFixed(2)}</strong></p>
                     <p className="text-muted-foreground">Members: <strong className="text-foreground">{totalMembers}</strong></p>
-                    {['Me', ...members].map((m) => (
-                      <p key={m} className="text-muted-foreground">{m}: <strong className="text-foreground">₹{getMemberShare(m).toFixed(2)}</strong></p>
-                    ))}
-                    {Math.abs(totalPaid - totalAmount) > 0.01 && (
-                      <p className="text-destructive text-xs font-medium mt-1">
-                        ⚠️ Total shares (₹{totalPaid.toFixed(2)}) don't match expense (₹{totalAmount.toFixed(2)})
-                      </p>
-                    )}
+                    {['Me', ...members].map((m) => <p key={m} className="text-muted-foreground">{m}: <strong className="text-foreground">₹{getMemberShare(m).toFixed(2)}</strong></p>)}
+                    {Math.abs(totalPaid - totalAmount) > 0.01 && <p className="text-destructive text-xs font-medium mt-1">⚠️ Total shares (₹{totalPaid.toFixed(2)}) don't match expense (₹{totalAmount.toFixed(2)})</p>}
                   </div>
                 )}
               </div>
             )}
 
-            <Button type="submit" className="w-full gap-2">
-              <PlusCircle className="w-4 h-4" />
-              Add Expense
-            </Button>
+            <Button type="submit" className="w-full gap-2"><PlusCircle className="w-4 h-4" /> Add Expense</Button>
           </form>
         </CardContent>
       </Card>

@@ -1,15 +1,15 @@
-import { useAppStore } from '@/store/useAppStore';
+import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { LogOut, User, Mail, Phone } from 'lucide-react';
 
 const Profile = () => {
-  const { currentUser, logout } = useAppStore();
+  const { profile, signOut } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
     navigate('/login');
   };
 
@@ -27,19 +27,19 @@ const Profile = () => {
               <User className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <p className="font-semibold text-foreground text-lg">{currentUser?.fullName}</p>
-              <p className="text-xs text-muted-foreground capitalize">{currentUser?.status}</p>
+              <p className="font-semibold text-foreground text-lg">{profile?.full_name}</p>
+              <p className="text-xs text-muted-foreground capitalize">{profile?.status}</p>
             </div>
           </div>
 
           <div className="space-y-3 pt-2">
             <div className="flex items-center gap-3 text-sm">
               <Mail className="w-4 h-4 text-muted-foreground" />
-              <span>{currentUser?.email}</span>
+              <span>{profile?.email}</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
               <Phone className="w-4 h-4 text-muted-foreground" />
-              <span>{currentUser?.phone}</span>
+              <span>{profile?.phone || 'N/A'}</span>
             </div>
           </div>
         </CardContent>
