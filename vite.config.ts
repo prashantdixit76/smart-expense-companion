@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig, type PluginOption } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
@@ -60,15 +60,15 @@ const pwaConfig = {
       },
     ],
   },
-};
+} as const;
 
 // https://vitejs.dev/config/
 export default defineConfig(async ({ mode }) => {
-  let pwaPlugin: unknown = null;
+  let pwaPlugin: PluginOption | null = null;
 
   try {
     const { VitePWA } = await import("vite-plugin-pwa");
-    pwaPlugin = VitePWA(pwaConfig);
+    pwaPlugin = VitePWA(pwaConfig as any);
   } catch {
     console.warn("[vite] vite-plugin-pwa not found, skipping PWA plugin for this build.");
   }
@@ -81,7 +81,7 @@ export default defineConfig(async ({ mode }) => {
         overlay: false,
       },
     },
-    plugins: [react(), mode === "development" && componentTagger(), pwaPlugin].filter(Boolean),
+    plugins: [react(), mode === "development" && componentTagger(), pwaPlugin].filter(Boolean) as PluginOption[],
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
