@@ -41,6 +41,8 @@ const UserManagement = () => {
   const [editForm, setEditForm] = useState({ fullName: '', email: '', phone: '' });
   const [newPassword, setNewPassword] = useState('');
   const [newRole, setNewRole] = useState<UserRole>('user');
+  const [resetPasswordUser, setResetPasswordUser] = useState<string | null>(null);
+  const [resetPass, setResetPass] = useState('');
 
   const isSuperAdmin = adminUser?.role === 'super_admin';
 
