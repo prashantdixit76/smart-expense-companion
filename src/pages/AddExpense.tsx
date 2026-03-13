@@ -27,8 +27,7 @@ const AddExpense = () => {
   // Group specific state
   const [members, setMembers] = useState<string[]>([]);
   const [newMember, setNewMember] = useState('');
-  const [paidBy, setPaidBy] = useState('Me');
-  const [myShare, setMyShare] = useState('');
+  const [memberShares, setMemberShares] = useState<Record<string, string>>({}); // each member's paid amount
 
   const [newCategory, setNewCategory] = useState('');
   const [showNewCategory, setShowNewCategory] = useState(false);
@@ -36,7 +35,12 @@ const AddExpense = () => {
   const totalAmount = parseFloat(form.amount) || 0;
   const totalMembers = members.length + 1; // +1 for self
   const equalShare = totalMembers > 0 ? totalAmount / totalMembers : 0;
-  const myShareAmount = myShare ? parseFloat(myShare) : equalShare;
+
+  const getMemberShare = (name: string) => {
+    const val = memberShares[name];
+    return val ? parseFloat(val) : equalShare;
+  };
+  const totalPaid = ['Me', ...members].reduce((sum, m) => sum + getMemberShare(m), 0);
 
   const handleAddMember = () => {
     const name = newMember.trim();
