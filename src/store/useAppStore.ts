@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { User, UserRole, Expense, Income, SystemLog } from '@/types/expense';
+import { User, UserRole, Expense, Income, SystemLog, UdhariEntry } from '@/types/expense';
 
 interface AppState {
   currentUser: User | null;
@@ -12,6 +12,7 @@ interface AppState {
   incomes: Income[];
   customCategories: string[];
   systemLogs: SystemLog[];
+  udhpiEntries: UdhariEntry[];
 
   // Auth
   signup: (user: Omit<User, 'id' | 'status' | 'role' | 'createdAt'>, password: string) => { success: boolean; message: string };
