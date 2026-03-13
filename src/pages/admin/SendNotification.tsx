@@ -22,6 +22,7 @@ const SendNotification = () => {
   const { user } = useAuth();
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
+  const [isImportant, setIsImportant] = useState(false);
   const [sending, setSending] = useState(false);
   const [sentNotifications, setSentNotifications] = useState<SentNotification[]>([]);
   const [loading, setLoading] = useState(true);
