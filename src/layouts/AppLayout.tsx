@@ -6,6 +6,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { InstallButton } from '@/components/InstallButton';
 import { Loader2, Wallet } from 'lucide-react';
+import { NotificationBell } from '@/components/NotificationBell';
 
 const AppLayout = () => {
   const { isAuthenticated, loading } = useAuth();
