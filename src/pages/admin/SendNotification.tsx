@@ -87,6 +87,7 @@ const SendNotification = () => {
       toast.success(`Notification sent to ${profiles?.length || 0} users!`);
       setTitle('');
       setMessage('');
+      setIsImportant(false);
       fetchSent();
     } catch (err: any) {
       toast.error(err.message || 'Failed to send notification');
