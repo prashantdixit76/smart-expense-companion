@@ -1,4 +1,4 @@
-import { openDB, DBSchema } from 'idb';
+import { openDB } from 'idb';
 
 interface OfflineExpense {
   id: string;
@@ -13,22 +13,16 @@ interface OfflineExpense {
   synced: boolean;
 }
 
-interface ExpenseTrackerDB extends DBSchema {
-  'offline-expenses': {
-    key: string;
-    value: OfflineExpense;
-    indexes: { 'by-synced': number };
-  };
-}
-
 const DB_NAME = 'expense-tracker-offline';
 const DB_VERSION = 1;
 
 export const getDb = () =>
-  openDB<ExpenseTrackerDB>(DB_NAME, DB_VERSION, {
+  openDB(DB_NAME, DB_VERSION, {
     upgrade(db) {
-      const store = db.createObjectStore('offline-expenses', { keyPath: 'id' });
-      store.createIndex('by-synced', 'synced');
+      if (!db.objectStoreNames.contains('offline-expenses')) {
+        const store = db.createObjectStore('offline-expenses', { keyPath: 'id' });
+        store.createIndex('by-synced', 'synced');
+      }
     },
   });
 
@@ -39,12 +33,13 @@ export const saveOfflineExpense = async (expense: Omit<OfflineExpense, 'synced'>
 
 export const getUnsyncedExpenses = async (): Promise<OfflineExpense[]> => {
   const db = await getDb();
-  return db.getAllFromIndex('offline-expenses', 'by-synced', false);
+  const all = await db.getAll('offline-expenses');
+  return (all as OfflineExpense[]).filter((e) => !e.synced);
 };
 
 export const markAsSynced = async (id: string) => {
   const db = await getDb();
-  const expense = await db.get('offline-expenses', id);
+  const expense = await db.get('offline-expenses', id) as OfflineExpense | undefined;
   if (expense) {
     await db.put('offline-expenses', { ...expense, synced: true });
   }
@@ -52,10 +47,12 @@ export const markAsSynced = async (id: string) => {
 
 export const clearSyncedExpenses = async () => {
   const db = await getDb();
-  const synced = await db.getAllFromIndex('offline-expenses', 'by-synced', true);
+  const all = await db.getAll('offline-expenses') as OfflineExpense[];
   const tx = db.transaction('offline-expenses', 'readwrite');
-  for (const item of synced) {
-    await tx.store.delete(item.id);
+  for (const item of all) {
+    if (item.synced) {
+      await tx.store.delete(item.id);
+    }
   }
   await tx.done;
 };
