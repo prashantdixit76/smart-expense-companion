@@ -18,6 +18,7 @@ const menuItems = [
   { title: 'Roles & Permissions', url: '/admin/roles', icon: ShieldCheck },
   { title: 'System Activity', url: '/admin/activity', icon: Activity },
   { title: 'Notifications', url: '/admin/notifications', icon: Bell },
+  { title: 'Support Tickets', url: '/admin/tickets', icon: TicketCheck },
   { title: 'Settings', url: '/admin/settings', icon: Settings },
 ];
 
