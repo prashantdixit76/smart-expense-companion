@@ -21,7 +21,7 @@ const plans = [
 const features = [
   'Unlimited Expense Tracking',
   'Income Management',
-  'Udhari / Split Bills',
+  'Accounts / Split Bills',
   'Reports & Analytics',
   'Multi-device Access',
 ];

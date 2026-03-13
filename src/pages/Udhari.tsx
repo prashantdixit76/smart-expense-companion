@@ -91,7 +91,7 @@ export default function Udhari() {
     <div className="space-y-6 pb-20 md:pb-6">
       <div className="flex items-center justify-between animate-fade-in">
         <div>
-          <h1 className="text-2xl font-extrabold text-foreground tracking-tight">Udhari</h1>
+          <h1 className="text-2xl font-extrabold text-foreground tracking-tight">Accounts</h1>
           <p className="text-sm text-muted-foreground">Track lending & borrowing</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

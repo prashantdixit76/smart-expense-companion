@@ -87,8 +87,8 @@ const Profile = () => {
       csv += `Total Expenses,₹${totalExp}\n`;
       csv += `Total Income,₹${totalInc}\n`;
       csv += `Net Savings,₹${totalInc - totalExp}\n`;
-      csv += `Udhari Given (Pending),₹${totalGiven}\n`;
-      csv += `Udhari Taken (Pending),₹${totalTaken}\n`;
+      csv += `Accounts Given (Pending),₹${totalGiven}\n`;
+      csv += `Accounts Taken (Pending),₹${totalTaken}\n`;
       csv += `\nGenerated on,${new Date().toLocaleString()}\n`;
       csv += `User,${profile?.full_name || ''}\n`;
 
