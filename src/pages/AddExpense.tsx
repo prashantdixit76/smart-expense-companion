@@ -27,8 +27,7 @@ const AddExpense = () => {
   // Group specific state
   const [members, setMembers] = useState<string[]>([]);
   const [newMember, setNewMember] = useState('');
-  const [paidBy, setPaidBy] = useState('Me');
-  const [myShare, setMyShare] = useState('');
+  const [memberShares, setMemberShares] = useState<Record<string, string>>({}); // each member's paid amount
 
   const [newCategory, setNewCategory] = useState('');
   const [showNewCategory, setShowNewCategory] = useState(false);
@@ -36,7 +35,12 @@ const AddExpense = () => {
   const totalAmount = parseFloat(form.amount) || 0;
   const totalMembers = members.length + 1; // +1 for self
   const equalShare = totalMembers > 0 ? totalAmount / totalMembers : 0;
-  const myShareAmount = myShare ? parseFloat(myShare) : equalShare;
+
+  const getMemberShare = (name: string) => {
+    const val = memberShares[name];
+    return val ? parseFloat(val) : equalShare;
+  };
+  const totalPaid = ['Me', ...members].reduce((sum, m) => sum + getMemberShare(m), 0);
 
   const handleAddMember = () => {
     const name = newMember.trim();
@@ -51,7 +55,9 @@ const AddExpense = () => {
 
   const handleRemoveMember = (name: string) => {
     setMembers(members.filter((m) => m !== name));
-    if (paidBy === name) setPaidBy('Me');
+    const newShares = { ...memberShares };
+    delete newShares[name];
+    setMemberShares(newShares);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -64,11 +70,13 @@ const AddExpense = () => {
       return;
     }
 
+    const sharesDetail = ['Me', ...members].map(m => `${m}: ₹${getMemberShare(m).toFixed(2)}`).join(', ');
+
     addExpense({
       amount,
       category: form.category,
       description: form.type === 'group'
-        ? `${form.description} | Group: ${['Me', ...members].join(', ')} | Paid by: ${paidBy} | My share: ₹${myShareAmount.toFixed(2)}`
+        ? `${form.description} | Group: ${['Me', ...members].join(', ')} | Shares: ${sharesDetail}`
         : form.description,
       date: form.date,
       paidBy: currentUser?.id || '',
@@ -80,8 +88,7 @@ const AddExpense = () => {
     setForm({ amount: '', category: '', description: '', date: format(new Date(), 'yyyy-MM-dd'), type: 'personal' });
     setMembers([]);
     setNewMember('');
-    setPaidBy('Me');
-    setMyShare('');
+    setMemberShares({});
   };
 
   const handleAddCategory = () => {
@@ -143,7 +150,7 @@ const AddExpense = () => {
             {/* Expense Type */}
             <div className="space-y-2">
               <Label>Expense Type</Label>
-              <RadioGroup value={form.type} onValueChange={(v) => { setForm({ ...form, type: v as 'personal' | 'group' }); setMembers([]); setPaidBy('Me'); setMyShare(''); }}>
+              <RadioGroup value={form.type} onValueChange={(v) => { setForm({ ...form, type: v as 'personal' | 'group' }); setMembers([]); setMemberShares({}); }}>
                 <div className="flex gap-4">
                   <div className="flex items-center gap-2">
                     <RadioGroupItem value="personal" id="personal" />
@@ -197,31 +204,39 @@ const AddExpense = () => {
                   <p className="text-xs text-muted-foreground">Total {totalMembers} member{totalMembers > 1 ? 's' : ''} (including you)</p>
                 </div>
 
-                {/* Who Paid */}
-                <div className="space-y-2">
-                  <Label>Who Paid?</Label>
-                  <Select value={paidBy} onValueChange={setPaidBy}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Me">Me</SelectItem>
-                      {members.map((m) => (
-                        <SelectItem key={m} value={m}>{m}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                {/* Per-member shares */}
+                {members.length > 0 && (
+                  <div className="space-y-3">
+                    <Label>Each Member's Share (₹)</Label>
+                    <p className="text-xs text-muted-foreground">Leave empty for equal split (₹{equalShare.toFixed(2)} each)</p>
+                    
+                    {/* Me */}
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-medium text-foreground w-24 truncate">Me (You)</span>
+                      <Input
+                        type="number"
+                        placeholder={`₹${equalShare.toFixed(2)}`}
+                        value={memberShares['Me'] || ''}
+                        onChange={(e) => setMemberShares({ ...memberShares, Me: e.target.value })}
+                        className="flex-1"
+                      />
+                    </div>
 
-                {/* My Share */}
-                <div className="space-y-2">
-                  <Label>My Share (₹)</Label>
-                  <Input
-                    type="number"
-                    placeholder={`Equal split: ₹${equalShare.toFixed(2)}`}
-                    value={myShare}
-                    onChange={(e) => setMyShare(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground">Leave empty for equal split</p>
-                </div>
+                    {/* Other members */}
+                    {members.map((m) => (
+                      <div key={m} className="flex items-center gap-3">
+                        <span className="text-sm font-medium text-foreground w-24 truncate">{m}</span>
+                        <Input
+                          type="number"
+                          placeholder={`₹${equalShare.toFixed(2)}`}
+                          value={memberShares[m] || ''}
+                          onChange={(e) => setMemberShares({ ...memberShares, [m]: e.target.value })}
+                          className="flex-1"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {/* Split Summary */}
                 {totalAmount > 0 && members.length > 0 && (
@@ -229,9 +244,14 @@ const AddExpense = () => {
                     <p className="font-medium text-foreground">Split Summary</p>
                     <p className="text-muted-foreground">Total: <strong className="text-foreground">₹{totalAmount.toFixed(2)}</strong></p>
                     <p className="text-muted-foreground">Members: <strong className="text-foreground">{totalMembers}</strong></p>
-                    <p className="text-muted-foreground">Equal share each: <strong className="text-foreground">₹{equalShare.toFixed(2)}</strong></p>
-                    <p className="text-muted-foreground">Your share: <strong className="text-foreground">₹{myShareAmount.toFixed(2)}</strong></p>
-                    <p className="text-muted-foreground">Paid by: <strong className="text-foreground">{paidBy}</strong></p>
+                    {['Me', ...members].map((m) => (
+                      <p key={m} className="text-muted-foreground">{m}: <strong className="text-foreground">₹{getMemberShare(m).toFixed(2)}</strong></p>
+                    ))}
+                    {Math.abs(totalPaid - totalAmount) > 0.01 && (
+                      <p className="text-destructive text-xs font-medium mt-1">
+                        ⚠️ Total shares (₹{totalPaid.toFixed(2)}) don't match expense (₹{totalAmount.toFixed(2)})
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
