@@ -288,6 +288,7 @@ export const useAppStore = create<AppState>()(
       },
 
       deleteExpense: (id) => set({ expenses: get().expenses.filter((e) => e.id !== id) }),
+      clearAllExpenses: () => set({ expenses: [] }),
 
       addIncome: (income) => {
         const newIncome: Income = { ...income, id: crypto.randomUUID(), createdAt: new Date().toISOString() };
