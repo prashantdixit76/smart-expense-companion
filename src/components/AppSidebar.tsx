@@ -18,7 +18,6 @@ const mainItems = [
   { title: 'Udhari', url: '/udhari', icon: HandCoins },
   { title: 'Reports', url: '/reports', icon: BarChart3 },
   { title: 'Profile', url: '/profile', icon: User },
-  { title: 'Profile', url: '/profile', icon: User },
 ];
 
 export function AppSidebar() {
