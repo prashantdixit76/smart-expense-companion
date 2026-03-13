@@ -19,6 +19,7 @@ const AddIncome = () => {
   const [form, setForm] = useState({ amount: '', source: '', description: '', date: format(new Date(), 'yyyy-MM-dd') });
   const [editItem, setEditItem] = useState<Income | null>(null);
   const [editForm, setEditForm] = useState({ amount: '', source: '', description: '', date: '' });
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
