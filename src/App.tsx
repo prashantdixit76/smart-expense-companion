@@ -25,6 +25,8 @@ import RolesPermissions from "@/pages/admin/RolesPermissions";
 import SystemActivity from "@/pages/admin/SystemActivity";
 import AdminSettings from "@/pages/admin/AdminSettings";
 import SendNotification from "@/pages/admin/SendNotification";
+import SupportTickets from "@/pages/admin/SupportTickets";
+import RaiseTicket from "@/pages/RaiseTicket";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
