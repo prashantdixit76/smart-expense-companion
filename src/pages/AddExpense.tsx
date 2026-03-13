@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { CATEGORIES, CATEGORY_ICONS } from '@/types/expense';
+import { saveOfflineExpense } from '@/lib/offlineDb';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -72,19 +73,37 @@ const AddExpense = () => {
 
     const sharesDetail = ['Me', ...members].map(m => `${m}: ₹${getMemberShare(m).toFixed(2)}`).join(', ');
 
-    addExpense({
-      amount,
-      category: form.category,
-      description: form.type === 'group'
-        ? `${form.description} | Group: ${['Me', ...members].join(', ')} | Shares: ${sharesDetail}`
-        : form.description,
-      date: form.date,
-      paidBy: currentUser?.id || '',
-      splitWith: members,
-      type: form.type,
-    });
+    if (!navigator.onLine) {
+      // Save offline
+      saveOfflineExpense({
+        id: crypto.randomUUID(),
+        amount,
+        category: form.category,
+        description: form.type === 'group'
+          ? `${form.description} | Group: ${['Me', ...members].join(', ')} | Shares: ${sharesDetail}`
+          : form.description,
+        date: form.date,
+        paidBy: currentUser?.id || '',
+        splitWith: members,
+        type: form.type,
+        createdAt: new Date().toISOString(),
+      });
+      toast.success('Expense saved offline! Will sync when online.');
+    } else {
+      addExpense({
+        amount,
+        category: form.category,
+        description: form.type === 'group'
+          ? `${form.description} | Group: ${['Me', ...members].join(', ')} | Shares: ${sharesDetail}`
+          : form.description,
+        date: form.date,
+        paidBy: currentUser?.id || '',
+        splitWith: members,
+        type: form.type,
+      });
+      toast.success('Expense added!');
+    }
 
-    toast.success('Expense added!');
     setForm({ amount: '', category: '', description: '', date: format(new Date(), 'yyyy-MM-dd'), type: 'personal' });
     setMembers([]);
     setNewMember('');
