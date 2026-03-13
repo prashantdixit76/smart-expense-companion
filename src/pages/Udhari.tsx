@@ -21,6 +21,7 @@ export default function Udhari() {
   const [filterType, setFilterType] = useState<'all' | 'given' | 'taken'>('all');
   const [editItem, setEditItem] = useState<UdhariEntry | null>(null);
   const [editForm, setEditForm] = useState({ contactName: '', phone: '', amount: '', type: 'given' as 'given' | 'taken', description: '', date: '' });
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({
     contactName: '', phone: '', amount: '', type: 'given' as 'given' | 'taken', description: '', date: new Date().toISOString().split('T')[0],
   });
