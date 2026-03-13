@@ -60,7 +60,9 @@ export default function Udhari() {
 
   const handleSettle = (id: string) => { settleUdhari(id); toast.success('Marked as settled! ✅'); };
 
-  const handleDelete = (id: string) => { deleteUdhari(id); toast.success('Entry deleted.'); };
+  const confirmDelete = () => {
+    if (deleteId) { deleteUdhari(deleteId); toast.success('Entry deleted.'); setDeleteId(null); }
+  };
 
   const openEdit = (entry: UdhariEntry) => {
     setEditItem(entry);
