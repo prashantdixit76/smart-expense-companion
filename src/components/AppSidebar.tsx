@@ -15,7 +15,7 @@ const mainItems = [
   { title: 'Add Expense', url: '/add-expense', icon: PlusCircle },
   { title: 'Add Income', url: '/add-income', icon: ArrowDownCircle },
   { title: 'Expenses', url: '/expenses', icon: List },
-  { title: 'Udhari', url: '/udhari', icon: HandCoins },
+  { title: 'Accounts', url: '/udhari', icon: HandCoins },
   { title: 'Reports', url: '/reports', icon: BarChart3 },
   { title: 'Profile', url: '/profile', icon: User },
 ];
