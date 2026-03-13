@@ -70,11 +70,13 @@ const AddExpense = () => {
       return;
     }
 
+    const sharesDetail = ['Me', ...members].map(m => `${m}: ₹${getMemberShare(m).toFixed(2)}`).join(', ');
+
     addExpense({
       amount,
       category: form.category,
       description: form.type === 'group'
-        ? `${form.description} | Group: ${['Me', ...members].join(', ')} | Paid by: ${paidBy} | My share: ₹${myShareAmount.toFixed(2)}`
+        ? `${form.description} | Group: ${['Me', ...members].join(', ')} | Shares: ${sharesDetail}`
         : form.description,
       date: form.date,
       paidBy: currentUser?.id || '',
@@ -86,8 +88,7 @@ const AddExpense = () => {
     setForm({ amount: '', category: '', description: '', date: format(new Date(), 'yyyy-MM-dd'), type: 'personal' });
     setMembers([]);
     setNewMember('');
-    setPaidBy('Me');
-    setMyShare('');
+    setMemberShares({});
   };
 
   const handleAddCategory = () => {
