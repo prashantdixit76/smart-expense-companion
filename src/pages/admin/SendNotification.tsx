@@ -110,6 +110,18 @@ const SendNotification = () => {
     }
   };
 
+  const handleDeleteOne = async (id: string) => {
+    try {
+      await supabase.from('user_notifications').delete().eq('notification_id', id);
+      const { error } = await supabase.from('notifications').delete().eq('id', id);
+      if (error) throw error;
+      setSentNotifications(prev => prev.filter(n => n.id !== id));
+      toast.success('Notification deleted');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-foreground">Send Notification</h1>
