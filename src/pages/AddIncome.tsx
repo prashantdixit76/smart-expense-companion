@@ -45,9 +45,8 @@ const AddIncome = () => {
     setEditItem(null);
   };
 
-  const handleDelete = (id: string) => {
-    deleteIncome(id);
-    toast.success('Income deleted.');
+  const confirmDelete = () => {
+    if (deleteId) { deleteIncome(deleteId); toast.success('Income deleted.'); setDeleteId(null); }
   };
 
   const sortedIncomes = [...incomes].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
