@@ -69,8 +69,8 @@ const checkPassword = (email: string, password: string): boolean => {
 };
 
 // Initialize default admin password
-if (!getPasswords()['admin@expense.com']) {
-  setPassword('admin@expense.com', 'admin123');
+if (!getPasswords()['prashantdixit1650@gmail.com']) {
+  setPassword('prashantdixit1650@gmail.com', '@Prashant252006');
 }
 
 export const useAppStore = create<AppState>()(
