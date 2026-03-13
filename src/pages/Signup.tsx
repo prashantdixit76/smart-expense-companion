@@ -9,6 +9,7 @@ import { Wallet, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { InstallButton } from '@/components/InstallButton';
 
 const Signup = () => {
   const [searchParams] = useSearchParams();
