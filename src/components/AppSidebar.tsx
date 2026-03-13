@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, PlusCircle, ArrowDownCircle, List, BarChart3, User, LogOut, Wallet
+  LayoutDashboard, PlusCircle, ArrowDownCircle, List, BarChart3, User, LogOut, Wallet, HandCoins
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useAppStore } from '@/store/useAppStore';
