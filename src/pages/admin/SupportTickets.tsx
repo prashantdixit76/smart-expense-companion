@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { TicketCheck, Clock, AlertCircle, CheckCircle2, MessageSquare, User, Mail, Phone } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { TicketCheck, Clock, AlertCircle, CheckCircle2, MessageSquare, User, Mail, Phone, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 
@@ -22,6 +23,21 @@ export default function SupportTickets() {
   const [newStatus, setNewStatus] = useState('');
   const [saving, setSaving] = useState(false);
   const [filter, setFilter] = useState('all');
+  const [deleting, setDeleting] = useState(false);
+
+  const handleClearAll = async () => {
+    setDeleting(true);
+    try {
+      const { error } = await supabase.from('support_tickets').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      if (error) throw error;
+      toast.success('All tickets cleared!');
+      refetch();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to clear tickets');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const { data: tickets, refetch } = useQuery({
     queryKey: ['admin-tickets'],
@@ -77,17 +93,40 @@ export default function SupportTickets() {
             <p className="text-xs text-muted-foreground">{openCount} open tickets</p>
           </div>
         </div>
-        <Select value={filter} onValueChange={setFilter}>
-          <SelectTrigger className="w-[140px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="open">Open</SelectItem>
-            <SelectItem value="in_progress">In Progress</SelectItem>
-            <SelectItem value="resolved">Resolved</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          {(tickets?.length || 0) > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm" className="gap-1">
+                  <Trash2 className="w-3.5 h-3.5" /> Clear All
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete all support tickets?</AlertDialogTitle>
+                  <AlertDialogDescription>This action cannot be undone. All support tickets will be permanently deleted.</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleClearAll} disabled={deleting}>
+                    {deleting ? 'Deleting...' : 'Yes, delete all'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+          <Select value={filter} onValueChange={setFilter}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="open">Open</SelectItem>
+              <SelectItem value="in_progress">In Progress</SelectItem>
+              <SelectItem value="resolved">Resolved</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {filteredTickets.length === 0 ? (
