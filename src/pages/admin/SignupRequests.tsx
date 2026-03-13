@@ -2,7 +2,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, XCircle, Clock, Mail, Phone, Calendar } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Mail, Phone, Calendar, Crown } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, parseISO } from 'date-fns';
 
