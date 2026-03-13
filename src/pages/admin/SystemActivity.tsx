@@ -106,11 +106,16 @@ const SystemActivity = () => {
             <Card key={log.id} className="border-border/50">
               <CardContent className="p-3">
                 <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-start gap-3 min-w-0">
+                  <div className="flex items-start gap-3 min-w-0 flex-1">
                     <Badge className={`text-[10px] shrink-0 ${actionColor[log.action] || 'bg-muted text-muted-foreground'}`}>{log.action}</Badge>
                     <div className="min-w-0"><p className="text-sm text-foreground truncate">{log.details}</p><p className="text-xs text-muted-foreground">by {log.user_name || 'System'}</p></div>
                   </div>
-                  <span className="text-[10px] text-muted-foreground whitespace-nowrap">{(() => { try { return format(parseISO(log.timestamp), 'dd MMM HH:mm'); } catch { return ''; } })()}</span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-[10px] text-muted-foreground whitespace-nowrap">{(() => { try { return format(parseISO(log.timestamp), 'dd MMM HH:mm'); } catch { return ''; } })()}</span>
+                    <button onClick={() => handleDeleteOne(log.id)} className="text-muted-foreground hover:text-destructive transition-colors p-1 rounded hover:bg-destructive/10">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
