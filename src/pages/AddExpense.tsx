@@ -150,7 +150,7 @@ const AddExpense = () => {
             {/* Expense Type */}
             <div className="space-y-2">
               <Label>Expense Type</Label>
-              <RadioGroup value={form.type} onValueChange={(v) => { setForm({ ...form, type: v as 'personal' | 'group' }); setMembers([]); setPaidBy('Me'); setMyShare(''); }}>
+              <RadioGroup value={form.type} onValueChange={(v) => { setForm({ ...form, type: v as 'personal' | 'group' }); setMembers([]); setMemberShares({}); }}>
                 <div className="flex gap-4">
                   <div className="flex items-center gap-2">
                     <RadioGroupItem value="personal" id="personal" />
