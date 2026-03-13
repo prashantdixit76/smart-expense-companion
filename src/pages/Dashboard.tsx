@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { CATEGORY_ICONS } from '@/types/expense';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrendingUp, TrendingDown, Wallet, CalendarDays } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, CalendarDays, Phone, MessageCircle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { format, startOfMonth, endOfMonth, isWithinInterval, parseISO } from 'date-fns';
 
@@ -208,6 +208,21 @@ const Dashboard = () => {
               ))}
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Support Section */}
+      <Card className="border-border/50">
+        <CardContent className="p-4">
+          <p className="text-sm font-semibold text-foreground mb-3">Need Help? Contact Support</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a href="tel:+917668974586" className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
+              <Phone className="w-4 h-4" /> +91 7668974586 (Call)
+            </a>
+            <a href="https://wa.me/917668974586" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-green-600 hover:underline">
+              <MessageCircle className="w-4 h-4" /> +91 7668974586 (WhatsApp)
+            </a>
+          </div>
         </CardContent>
       </Card>
     </div>
