@@ -9,6 +9,7 @@ import { Wallet, LogIn, Phone, MessageCircle, Check, Crown } from 'lucide-react'
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { InstallButton } from '@/components/InstallButton';
 
 const plans = [
   { id: 'monthly', name: 'Monthly', price: 50, duration: '1 Month', perMonth: 50 },
