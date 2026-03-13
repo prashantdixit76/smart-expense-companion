@@ -7,8 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Send, Bell, Loader2 } from 'lucide-react';
+import { Send, Bell, Loader2, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface SentNotification {
   id: string;
@@ -24,6 +25,7 @@ const SendNotification = () => {
   const [sending, setSending] = useState(false);
   const [sentNotifications, setSentNotifications] = useState<SentNotification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetchSent();
@@ -48,7 +50,6 @@ const SendNotification = () => {
 
     setSending(true);
     try {
-      // 1. Insert notification
       const { data: notif, error: notifErr } = await supabase
         .from('notifications')
         .insert({ title: title.trim(), message: message.trim(), sent_by: user.id })
@@ -57,7 +58,6 @@ const SendNotification = () => {
 
       if (notifErr) throw notifErr;
 
-      // 2. Get all approved users
       const { data: profiles } = await supabase
         .from('profiles')
         .select('user_id')
@@ -76,7 +76,6 @@ const SendNotification = () => {
         if (insertErr) throw insertErr;
       }
 
-      // 3. Log
       await supabase.from('system_logs').insert({
         action: 'notification_sent',
         details: `Notification "${title}" sent to ${profiles?.length || 0} users`,
@@ -92,6 +91,22 @@ const SendNotification = () => {
       toast.error(err.message || 'Failed to send notification');
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleClearAll = async () => {
+    setDeleting(true);
+    try {
+      // Delete user_notifications first (foreign key dependency)
+      await supabase.from('user_notifications').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      const { error } = await supabase.from('notifications').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      if (error) throw error;
+      toast.success('All notifications cleared!');
+      setSentNotifications([]);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to clear notifications');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -136,10 +151,33 @@ const SendNotification = () => {
 
       <Card className="border-border/50">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Bell className="w-4 h-4 text-primary" />
-            Sent Notifications
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Bell className="w-4 h-4 text-primary" />
+              Sent Notifications
+            </CardTitle>
+            {sentNotifications.length > 0 && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm" className="gap-1">
+                    <Trash2 className="w-3.5 h-3.5" /> Clear All
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete all notifications?</AlertDialogTitle>
+                    <AlertDialogDescription>This action cannot be undone. All sent notifications will be permanently deleted.</AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleClearAll} disabled={deleting}>
+                      {deleting ? 'Deleting...' : 'Yes, delete all'}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           {loading ? (
