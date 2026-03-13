@@ -41,6 +41,10 @@ interface AppState {
   deleteIncome: (id: string) => void;
   addCustomCategory: (category: string) => void;
 
+  // Udhari
+  addUdhari: (entry: Omit<UdhariEntry, 'id' | 'createdAt' | 'settled'>) => void;
+  settleUdhari: (id: string) => void;
+
   // Logs
   addLog: (action: string, details: string) => void;
 }
