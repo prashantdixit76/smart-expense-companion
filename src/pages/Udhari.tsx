@@ -89,76 +89,93 @@ export default function Udhari() {
 
   return (
     <div className="space-y-6 pb-20 md:pb-6">
-      <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold text-foreground">Udhari</h1><p className="text-sm text-muted-foreground">Track lending & borrowing</p></div>
+      <div className="flex items-center justify-between animate-fade-in">
+        <div>
+          <h1 className="text-2xl font-extrabold text-foreground tracking-tight">Udhari</h1>
+          <p className="text-sm text-muted-foreground">Track lending & borrowing</p>
+        </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild><Button className="gap-2"><Plus className="w-4 h-4" /> New Entry</Button></DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogTrigger asChild><Button className="gap-2 rounded-xl gradient-primary text-primary-foreground"><Plus className="w-4 h-4" /> New Entry</Button></DialogTrigger>
+          <DialogContent className="glass-card rounded-2xl max-w-[calc(100vw-2rem)] sm:max-w-md">
             <DialogHeader><DialogTitle>Add New Entry</DialogTitle></DialogHeader>
             <div className="space-y-4 pt-2">
               <div className="grid grid-cols-2 gap-3">
-                <Button type="button" variant={form.type === 'given' ? 'default' : 'outline'} className="gap-2" onClick={() => setForm(f => ({ ...f, type: 'given' }))}><ArrowUpCircle className="w-4 h-4" /> I Gave</Button>
-                <Button type="button" variant={form.type === 'taken' ? 'default' : 'outline'} className="gap-2" onClick={() => setForm(f => ({ ...f, type: 'taken' }))}><ArrowDownCircle className="w-4 h-4" /> I Took</Button>
+                <Button type="button" variant={form.type === 'given' ? 'default' : 'outline'} className="gap-2 rounded-xl" onClick={() => setForm(f => ({ ...f, type: 'given' }))}><ArrowUpCircle className="w-4 h-4" /> I Gave</Button>
+                <Button type="button" variant={form.type === 'taken' ? 'default' : 'outline'} className="gap-2 rounded-xl" onClick={() => setForm(f => ({ ...f, type: 'taken' }))}><ArrowDownCircle className="w-4 h-4" /> I Took</Button>
               </div>
-              <div><Label>Contact Name *</Label><Input placeholder="Enter name" value={form.contactName} onChange={e => setForm(f => ({ ...f, contactName: e.target.value }))} /></div>
-              <div><Label>Phone (optional)</Label><Input placeholder="Phone number" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} /></div>
-              <div><Label>Amount (₹) *</Label><Input type="number" placeholder="0" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} /></div>
-              <div><Label>Description</Label><Textarea placeholder="What is this for..." value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} /></div>
-              <div><Label>Date</Label><Input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} /></div>
-              <Button className="w-full" onClick={handleSubmit}>Add Entry</Button>
+              <div><Label>Contact Name *</Label><Input placeholder="Enter name" className="rounded-xl" value={form.contactName} onChange={e => setForm(f => ({ ...f, contactName: e.target.value }))} /></div>
+              <div><Label>Phone (optional)</Label><Input placeholder="Phone number" className="rounded-xl" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} /></div>
+              <div><Label>Amount (₹) *</Label><Input type="number" placeholder="0" className="rounded-xl" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} /></div>
+              <div><Label>Description</Label><Textarea placeholder="What is this for..." className="rounded-xl" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} /></div>
+              <div><Label>Date</Label><Input type="date" className="rounded-xl" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} /></div>
+              <Button className="w-full rounded-xl gradient-primary text-primary-foreground" onClick={handleSubmit}>Add Entry</Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="border-l-4 border-l-destructive"><CardContent className="p-4"><p className="text-xs text-muted-foreground">Total Given</p><p className="text-xl font-bold text-destructive">₹{summary.totalGiven.toLocaleString()}</p></CardContent></Card>
-        <Card className="border-l-4 border-l-green-500"><CardContent className="p-4"><p className="text-xs text-muted-foreground">Total Taken</p><p className="text-xl font-bold text-green-600">₹{summary.totalTaken.toLocaleString()}</p></CardContent></Card>
-        <Card className="border-l-4 border-l-orange-500"><CardContent className="p-4"><p className="text-xs text-muted-foreground">Pending to Receive</p><p className="text-xl font-bold text-orange-600">₹{summary.pendingGiven.toLocaleString()}</p></CardContent></Card>
-        <Card className="border-l-4 border-l-blue-500"><CardContent className="p-4"><p className="text-xs text-muted-foreground">Pending to Pay</p><p className="text-xl font-bold text-blue-600">₹{summary.pendingTaken.toLocaleString()}</p></CardContent></Card>
+      <div className="grid grid-cols-2 gap-3 animate-fade-in">
+        <div className="stat-card border-l-4 border-l-destructive"><p className="text-xs text-muted-foreground font-medium">Total Given</p><p className="text-xl font-bold text-destructive">₹{summary.totalGiven.toLocaleString()}</p></div>
+        <div className="stat-card border-l-4 border-l-green-500"><p className="text-xs text-muted-foreground font-medium">Total Taken</p><p className="text-xl font-bold text-income">₹{summary.totalTaken.toLocaleString()}</p></div>
+        <div className="stat-card border-l-4 border-l-orange-500"><p className="text-xs text-muted-foreground font-medium">Pending to Receive</p><p className="text-xl font-bold text-owe">₹{summary.pendingGiven.toLocaleString()}</p></div>
+        <div className="stat-card border-l-4 border-l-blue-500"><p className="text-xs text-muted-foreground font-medium">Pending to Pay</p><p className="text-xl font-bold text-primary">₹{summary.pendingTaken.toLocaleString()}</p></div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><Input placeholder="Search contacts..." className="pl-9" value={search} onChange={e => setSearch(e.target.value)} /></div>
-        <Select value={filterType} onValueChange={(v: any) => setFilterType(v)}><SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All</SelectItem><SelectItem value="given">I Gave</SelectItem><SelectItem value="taken">I Took</SelectItem></SelectContent></Select>
+      <div className="flex flex-col sm:flex-row gap-3 animate-fade-in">
+        <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><Input placeholder="Search contacts..." className="pl-9 rounded-xl" value={search} onChange={e => setSearch(e.target.value)} /></div>
+        <Select value={filterType} onValueChange={(v: any) => setFilterType(v)}><SelectTrigger className="w-full sm:w-[150px] rounded-xl"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All</SelectItem><SelectItem value="given">I Gave</SelectItem><SelectItem value="taken">I Took</SelectItem></SelectContent></Select>
       </div>
 
       {contacts.size === 0 ? (
-        <Card><CardContent className="p-12 text-center text-muted-foreground"><IndianRupee className="w-12 h-12 mx-auto mb-3 opacity-30" /><p className="text-lg font-medium">No entries yet</p><p className="text-sm">Click "New Entry" above to add one</p></CardContent></Card>
+        <Card className="glass-card rounded-2xl animate-fade-in">
+          <CardContent className="p-12 text-center text-muted-foreground">
+            <IndianRupee className="w-12 h-12 mx-auto mb-3 opacity-30" />
+            <p className="text-lg font-semibold">No entries yet</p>
+            <p className="text-sm">Click "New Entry" above to add one</p>
+          </CardContent>
+        </Card>
       ) : (
-        Array.from(contacts.entries()).map(([name, contactEntries]) => {
+        Array.from(contacts.entries()).map(([name, contactEntries], groupIdx) => {
           const contactPendingGiven = contactEntries.filter(e => e.type === 'given' && !e.settled).reduce((s, e) => s + e.amount, 0);
           const contactPendingTaken = contactEntries.filter(e => e.type === 'taken' && !e.settled).reduce((s, e) => s + e.amount, 0);
           return (
-            <Card key={name} className="overflow-hidden">
+            <Card key={name} className="glass-card rounded-2xl overflow-hidden animate-fade-in" style={{ animationDelay: `${groupIdx * 60}ms` }}>
               <CardHeader className="pb-3 bg-muted/30">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center"><User className="w-5 h-5 text-primary" /></div><div><CardTitle className="text-base">{name}</CardTitle>{contactEntries[0]?.phone && <p className="text-xs text-muted-foreground">{contactEntries[0].phone}</p>}</div></div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <User className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-base">{name}</CardTitle>
+                      {contactEntries[0]?.phone && <p className="text-xs text-muted-foreground">{contactEntries[0].phone}</p>}
+                    </div>
+                  </div>
                   <div className="text-right text-sm">
                     {contactPendingGiven > 0 && <p className="text-destructive font-semibold">To Receive: ₹{contactPendingGiven.toLocaleString()}</p>}
-                    {contactPendingTaken > 0 && <p className="text-blue-600 font-semibold">To Pay: ₹{contactPendingTaken.toLocaleString()}</p>}
+                    {contactPendingTaken > 0 && <p className="text-primary font-semibold">To Pay: ₹{contactPendingTaken.toLocaleString()}</p>}
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
                 {contactEntries.map(entry => (
-                  <div key={entry.id} className="flex items-center justify-between px-4 py-3 border-t border-border/50 hover:bg-muted/20 transition-colors">
-                    <div className="flex items-center gap-3">
-                      {entry.type === 'given' ? <ArrowUpCircle className="w-5 h-5 text-destructive shrink-0" /> : <ArrowDownCircle className="w-5 h-5 text-green-600 shrink-0" />}
-                      <div>
+                  <div key={entry.id} className="flex items-center justify-between px-4 py-3 border-t border-border/30 hover:bg-muted/20 transition-colors">
+                    <div className="flex items-center gap-3 min-w-0">
+                      {entry.type === 'given' ? <ArrowUpCircle className="w-5 h-5 text-destructive shrink-0" /> : <ArrowDownCircle className="w-5 h-5 text-income shrink-0" />}
+                      <div className="min-w-0">
                         <p className="text-sm font-medium">{entry.type === 'given' ? 'Given' : 'Taken'} — ₹{entry.amount.toLocaleString()}</p>
-                        {entry.description && <p className="text-xs text-muted-foreground">{entry.description}</p>}
+                        {entry.description && <p className="text-xs text-muted-foreground truncate">{entry.description}</p>}
                         <p className="text-xs text-muted-foreground">{format(new Date(entry.date), 'dd MMM yyyy')}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 shrink-0 ml-2">
                       {entry.settled ? (
-                        <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50 gap-1"><CheckCircle2 className="w-3 h-3" /> Settled</Badge>
+                        <Badge variant="outline" className="text-income border-green-300/50 bg-green-50/50 dark:bg-green-950/30 gap-1 rounded-lg"><CheckCircle2 className="w-3 h-3" /> Settled</Badge>
                       ) : (
-                        <Button size="sm" variant="outline" className="gap-1 text-xs" onClick={() => handleSettle(entry.id)}><CheckCircle2 className="w-3 h-3" /> Settle</Button>
+                        <Button size="sm" variant="outline" className="gap-1 text-xs rounded-lg" onClick={() => handleSettle(entry.id)}><CheckCircle2 className="w-3 h-3" /> Settle</Button>
                       )}
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => openEdit(entry)}><Pencil className="w-4 h-4" /></Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => setDeleteId(entry.id)}><Trash2 className="w-4 h-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary rounded-xl" onClick={() => openEdit(entry)}><Pencil className="w-4 h-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive rounded-xl" onClick={() => setDeleteId(entry.id)}><Trash2 className="w-4 h-4" /></Button>
                     </div>
                   </div>
                 ))}
@@ -169,27 +186,27 @@ export default function Udhari() {
       )}
 
       <Dialog open={!!editItem} onOpenChange={(open) => !open && setEditItem(null)}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="glass-card rounded-2xl max-w-[calc(100vw-2rem)] sm:max-w-md">
           <DialogHeader><DialogTitle>Edit Entry</DialogTitle></DialogHeader>
           <div className="space-y-4 pt-2">
             <div className="grid grid-cols-2 gap-3">
-              <Button type="button" variant={editForm.type === 'given' ? 'default' : 'outline'} className="gap-2" onClick={() => setEditForm(f => ({ ...f, type: 'given' }))}><ArrowUpCircle className="w-4 h-4" /> I Gave</Button>
-              <Button type="button" variant={editForm.type === 'taken' ? 'default' : 'outline'} className="gap-2" onClick={() => setEditForm(f => ({ ...f, type: 'taken' }))}><ArrowDownCircle className="w-4 h-4" /> I Took</Button>
+              <Button type="button" variant={editForm.type === 'given' ? 'default' : 'outline'} className="gap-2 rounded-xl" onClick={() => setEditForm(f => ({ ...f, type: 'given' }))}><ArrowUpCircle className="w-4 h-4" /> I Gave</Button>
+              <Button type="button" variant={editForm.type === 'taken' ? 'default' : 'outline'} className="gap-2 rounded-xl" onClick={() => setEditForm(f => ({ ...f, type: 'taken' }))}><ArrowDownCircle className="w-4 h-4" /> I Took</Button>
             </div>
-            <div><Label>Contact Name</Label><Input value={editForm.contactName} onChange={e => setEditForm(f => ({ ...f, contactName: e.target.value }))} /></div>
-            <div><Label>Phone</Label><Input value={editForm.phone} onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))} /></div>
-            <div><Label>Amount (₹)</Label><Input type="number" value={editForm.amount} onChange={e => setEditForm(f => ({ ...f, amount: e.target.value }))} /></div>
-            <div><Label>Description</Label><Textarea value={editForm.description} onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))} /></div>
-            <div><Label>Date</Label><Input type="date" value={editForm.date} onChange={e => setEditForm(f => ({ ...f, date: e.target.value }))} /></div>
-            <Button className="w-full" onClick={handleUpdate}>Save Changes</Button>
+            <div><Label>Contact Name</Label><Input className="rounded-xl" value={editForm.contactName} onChange={e => setEditForm(f => ({ ...f, contactName: e.target.value }))} /></div>
+            <div><Label>Phone</Label><Input className="rounded-xl" value={editForm.phone} onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))} /></div>
+            <div><Label>Amount (₹)</Label><Input type="number" className="rounded-xl" value={editForm.amount} onChange={e => setEditForm(f => ({ ...f, amount: e.target.value }))} /></div>
+            <div><Label>Description</Label><Textarea className="rounded-xl" value={editForm.description} onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))} /></div>
+            <div><Label>Date</Label><Input type="date" className="rounded-xl" value={editForm.date} onChange={e => setEditForm(f => ({ ...f, date: e.target.value }))} /></div>
+            <Button className="w-full rounded-xl gradient-primary text-primary-foreground" onClick={handleUpdate}>Save Changes</Button>
           </div>
         </DialogContent>
       </Dialog>
 
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="glass-card rounded-2xl max-w-[calc(100vw-2rem)] sm:max-w-lg">
           <AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
-          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction></AlertDialogFooter>
+          <AlertDialogFooter><AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel><AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl">Delete</AlertDialogAction></AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>
