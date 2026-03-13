@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Download } from 'lucide-react';
+import { Download, MonitorSmartphone, PlusSquare, Share } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -15,57 +23,135 @@ interface InstallButtonProps {
 
 export const InstallButton = ({ className, variant = 'icon' }: InstallButtonProps) => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
+  const [showGuide, setShowGuide] = useState(false);
+  const [isIos, setIsIos] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
-    const handler = (e: Event) => {
+    const ios = /iPad|iPhone|iPod/.test(window.navigator.userAgent);
+    setIsIos(ios);
+
+    const syncStandaloneState = () => {
+      const standalone =
+        window.matchMedia('(display-mode: standalone)').matches ||
+        Boolean((window.navigator as Navigator & { standalone?: boolean }).standalone);
+      setIsStandalone(standalone);
+    };
+
+    const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
-    const onOnline = () => setIsOnline(true);
-    const onOffline = () => setIsOnline(false);
 
-    window.addEventListener('beforeinstallprompt', handler);
-    window.addEventListener('online', onOnline);
-    window.addEventListener('offline', onOffline);
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    const handleInstalled = () => {
+      setIsStandalone(true);
+      setDeferredPrompt(null);
+      toast.success('App installed successfully');
+    };
+
+    syncStandaloneState();
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('appinstalled', handleInstalled);
+
     return () => {
-      window.removeEventListener('beforeinstallprompt', handler);
-      window.removeEventListener('online', onOnline);
-      window.removeEventListener('offline', onOffline);
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('appinstalled', handleInstalled);
     };
   }, []);
 
   const handleInstall = async () => {
+    if (!isOnline) {
+      toast.error('You are offline. Connect to internet to install app.');
+      return;
+    }
+
+    if (isStandalone) {
+      toast.message('App is already installed on this device.');
+      return;
+    }
+
     if (deferredPrompt) {
       await deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
+      const choice = await deferredPrompt.userChoice;
+      if (choice.outcome === 'dismissed') setShowGuide(true);
       setDeferredPrompt(null);
+      return;
     }
+
+    setShowGuide(true);
   };
 
-  // Hide only when offline
   if (!isOnline) return null;
 
-  if (variant === 'full') {
-    return (
-      <Button size="sm" variant="outline" className={cn('gap-2', className)} onClick={handleInstall}>
-        <Download className="w-4 h-4" />
-        Install App
-      </Button>
-    );
-  }
+  const buttonContent = (
+    <>
+      <Download className={variant === 'full' ? 'w-4 h-4' : 'w-5 h-5'} />
+      {variant === 'full' ? 'Install App' : null}
+    </>
+  );
 
   return (
-    <button
-      onClick={handleInstall}
-      className={cn(
-        'p-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors relative',
-        className
+    <>
+      {variant === 'full' ? (
+        <Button size="sm" variant="outline" className={cn('gap-2', className)} onClick={handleInstall}>
+          {buttonContent}
+        </Button>
+      ) : (
+        <button
+          onClick={handleInstall}
+          className={cn(
+            'p-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors relative',
+            className
+          )}
+          title="Install App"
+          aria-label="Install App"
+        >
+          {buttonContent}
+          <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-primary rounded-full animate-pulse" />
+        </button>
       )}
-      title="Install App"
-    >
-      <Download className="w-5 h-5" />
-      <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-primary rounded-full animate-pulse" />
-    </button>
+
+      <Dialog open={showGuide} onOpenChange={setShowGuide}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-foreground">
+              <MonitorSmartphone className="w-5 h-5 text-primary" />
+              Install Smart Expense Tracker
+            </DialogTitle>
+            <DialogDescription>
+              {isIos
+                ? 'iPhone/iPad par install ke liye in steps ko follow karein:'
+                : 'Browser menu se app install karne ke steps:'}
+            </DialogDescription>
+          </DialogHeader>
+
+          {isIos ? (
+            <ol className="space-y-3 text-sm text-foreground">
+              <li className="flex items-center gap-2">
+                <Share className="w-4 h-4 text-primary" /> Safari me niche <strong>Share</strong> button dabayein
+              </li>
+              <li className="flex items-center gap-2">
+                <PlusSquare className="w-4 h-4 text-primary" /> <strong>Add to Home Screen</strong> select karein
+              </li>
+              <li>Confirm karke <strong>Add</strong> karein</li>
+            </ol>
+          ) : (
+            <ol className="space-y-2 text-sm text-foreground list-decimal pl-5">
+              <li>Browser ke top-right menu (⋮ / ⋯) par click karein</li>
+              <li><strong>Install App</strong> ya <strong>Add to Home screen</strong> option choose karein</li>
+              <li>Confirm karke install complete karein</li>
+            </ol>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
