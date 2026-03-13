@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LogOut, Mail, Phone, Shield, RotateCcw } from 'lucide-react';
+import { LogOut, Mail, Phone, Shield, RotateCcw, Download } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,6 +44,69 @@ const Profile = () => {
   const [resetting, setResetting] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [avatar, setAvatar] = useState(() => localStorage.getItem('profile_avatar') || '😎');
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadAllData = async () => {
+    if (!user) return;
+    setDownloading(true);
+    try {
+      const [expRes, incRes, udhRes] = await Promise.all([
+        supabase.from('expenses').select('*').eq('user_id', user.id).order('date', { ascending: false }),
+        supabase.from('incomes').select('*').eq('user_id', user.id).order('date', { ascending: false }),
+        supabase.from('udhari_entries').select('*').eq('user_id', user.id).order('date', { ascending: false }),
+      ]);
+
+      const expenses = expRes.data || [];
+      const incomes = incRes.data || [];
+      const udhari = udhRes.data || [];
+
+      let csv = '=== EXPENSES ===\n';
+      csv += 'Date,Category,Description,Amount,Type,Paid By\n';
+      expenses.forEach(e => {
+        csv += `${e.date},${e.category},"${e.description || ''}",₹${e.amount},${e.type || 'personal'},"${e.paid_by || ''}"\n`;
+      });
+
+      csv += '\n=== INCOMES ===\n';
+      csv += 'Date,Source,Description,Amount\n';
+      incomes.forEach(i => {
+        csv += `${i.date},${i.source},"${i.description || ''}",₹${i.amount}\n`;
+      });
+
+      csv += '\n=== UDHARI (Lending/Borrowing) ===\n';
+      csv += 'Date,Contact,Type,Description,Amount,Settled\n';
+      udhari.forEach(u => {
+        csv += `${u.date},"${u.contact_name}",${u.type === 'given' ? 'Given' : 'Taken'},"${u.description || ''}",₹${u.amount},${u.settled ? 'Yes' : 'No'}\n`;
+      });
+
+      const totalExp = expenses.reduce((s, e) => s + Number(e.amount), 0);
+      const totalInc = incomes.reduce((s, i) => s + Number(i.amount), 0);
+      const totalGiven = udhari.filter(u => u.type === 'given' && !u.settled).reduce((s, u) => s + Number(u.amount), 0);
+      const totalTaken = udhari.filter(u => u.type === 'taken' && !u.settled).reduce((s, u) => s + Number(u.amount), 0);
+
+      csv += '\n=== SUMMARY ===\n';
+      csv += `Total Expenses,₹${totalExp}\n`;
+      csv += `Total Income,₹${totalInc}\n`;
+      csv += `Net Savings,₹${totalInc - totalExp}\n`;
+      csv += `Udhari Given (Pending),₹${totalGiven}\n`;
+      csv += `Udhari Taken (Pending),₹${totalTaken}\n`;
+      csv += `\nGenerated on,${new Date().toLocaleString()}\n`;
+      csv += `User,${profile?.full_name || ''}\n`;
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `MyFinance_Data_${format(new Date(), 'yyyy-MM-dd')}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      toast({ title: 'Download Complete ✅', description: 'Your data has been downloaded as CSV.' });
+    } catch {
+      toast({ title: 'Error', description: 'Failed to download data.', variant: 'destructive' });
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const handleSelectAvatar = (emoji: string) => {
     setAvatar(emoji);
@@ -135,6 +198,15 @@ const Profile = () => {
           </div>
         </CardContent>
       </Card>
+
+      <Button
+        className="w-full gap-2 h-11 rounded-xl shadow-md gradient-primary text-primary-foreground"
+        onClick={handleDownloadAllData}
+        disabled={downloading}
+      >
+        <Download className="w-4 h-4" />
+        {downloading ? 'Downloading...' : 'Download All Data (CSV)'}
+      </Button>
 
       <Button
         variant="outline"
