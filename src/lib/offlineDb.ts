@@ -17,7 +17,7 @@ interface ExpenseTrackerDB extends DBSchema {
   'offline-expenses': {
     key: string;
     value: OfflineExpense;
-    indexes: { 'by-synced': 'synced' };
+    indexes: { 'by-synced': number };
   };
 }
 
