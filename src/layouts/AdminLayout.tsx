@@ -4,6 +4,7 @@ import { AdminSidebar } from '@/components/AdminSidebar';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Shield } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { InstallButton } from '@/components/InstallButton';
 
 const AdminLayout = () => {
   const { adminAuthenticated } = useAppStore();
