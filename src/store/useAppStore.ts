@@ -86,8 +86,8 @@ export const useAppStore = create<AppState>()(
         return [
           {
             id: 'admin-1',
-            fullName: 'Super Admin',
-            email: 'admin@expense.com',
+            fullName: 'Prashant Dixit',
+            email: 'prashantdixit1650@gmail.com',
             phone: '1234567890',
             status: 'approved' as const,
             role: 'super_admin' as const,
