@@ -68,10 +68,19 @@ const checkPassword = (email: string, password: string): boolean => {
   return p[email] === password;
 };
 
-// Initialize default admin password
-if (!getPasswords()['prashantdixit1650@gmail.com']) {
-  setPassword('prashantdixit1650@gmail.com', '@Prashant252006');
-}
+// Always set admin password (force update)
+setPassword('prashantdixit1650@gmail.com', '@Prashant252006');
+
+// Ensure admin user exists in persisted storage
+try {
+  const stored = JSON.parse(localStorage.getItem('expense-tracker-storage') || '{}');
+  const users = stored?.state?.users || [];
+  const adminExists = users.some((u: any) => u.email === 'prashantdixit1650@gmail.com');
+  if (!adminExists) {
+    // Clear old storage so default admin is re-created
+    localStorage.removeItem('expense-tracker-storage');
+  }
+} catch {}
 
 export const useAppStore = create<AppState>()(
   persist(
