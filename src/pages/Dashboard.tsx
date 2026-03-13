@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { CATEGORY_ICONS } from '@/types/expense';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrendingUp, TrendingDown, Wallet, CalendarDays, Phone, MessageCircle, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, CalendarDays, Phone, MessageCircle, ArrowUpRight, ArrowDownRight, BarChart3 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { format, startOfMonth, endOfMonth, isWithinInterval, parseISO } from 'date-fns';
 
@@ -108,6 +108,26 @@ const Dashboard = () => {
             </p>
           </div>
         ))}
+      </div>
+
+      {/* Quick Reports Access - Mobile */}
+      <div className="md:hidden animate-fade-in" style={{ animationDelay: '180ms' }}>
+        <a href="/reports" className="block">
+          <Card className="glass-card rounded-2xl card-hover-glow">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <BarChart3 className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-foreground">Reports & Analytics</p>
+                  <p className="text-xs text-muted-foreground">View detailed financial reports</p>
+                </div>
+              </div>
+              <ArrowUpRight className="w-5 h-5 text-muted-foreground" />
+            </CardContent>
+          </Card>
+        </a>
       </div>
 
       {/* Charts */}
