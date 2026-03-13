@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,8 +7,14 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wallet, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 
 const Signup = () => {
+  const [searchParams] = useSearchParams();
+  const selectedPlan = searchParams.get('plan');
+  const selectedPrice = searchParams.get('price');
+  const selectedDuration = searchParams.get('duration');
+
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -57,6 +63,15 @@ const Signup = () => {
         </div>
 
         <Card className="border-border/50 shadow-lg">
+          {selectedPlan && (
+            <div className="bg-primary/5 border-b border-border/50 px-6 py-3 flex items-center justify-between rounded-t-lg">
+              <div>
+                <p className="text-sm font-semibold text-foreground">Selected Plan: <span className="capitalize">{selectedPlan}</span></p>
+                <p className="text-xs text-muted-foreground">{selectedDuration}</p>
+              </div>
+              <Badge className="bg-primary text-primary-foreground">₹{selectedPrice}</Badge>
+            </div>
+          )}
           <CardHeader className="pb-4">
             <CardTitle className="text-xl">Sign Up</CardTitle>
             <CardDescription>Fill in your details to get started</CardDescription>
