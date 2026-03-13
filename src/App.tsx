@@ -3,6 +3,9 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
+import { InstallPrompt } from "@/components/InstallPrompt";
+import { useOfflineSync } from "@/hooks/useOfflineSync";
 import AppLayout from "@/layouts/AppLayout";
 import AdminLayout from "@/layouts/AdminLayout";
 import Login from "@/pages/Login";
@@ -25,9 +28,13 @@ import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+const AppContent = () => {
+  useOfflineSync();
+
+  return (
+    <>
+      <OfflineIndicator />
+      <InstallPrompt />
       <Toaster />
       <Sonner />
       <BrowserRouter>
@@ -60,6 +67,14 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+    </>
+  );
+};
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <AppContent />
     </TooltipProvider>
   </QueryClientProvider>
 );
