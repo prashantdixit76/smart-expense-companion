@@ -5,12 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { ArrowUpCircle, ArrowDownCircle, CheckCircle2, Plus, IndianRupee, Clock, Search, User } from 'lucide-react';
+import { ArrowUpCircle, ArrowDownCircle, CheckCircle2, Plus, IndianRupee, Search, User } from 'lucide-react';
 import { format } from 'date-fns';
 import type { UdhariEntry } from '@/types/expense';
 
@@ -28,7 +27,6 @@ export default function Udhari() {
     date: new Date().toISOString().split('T')[0],
   });
 
-  // Summary calculations
   const summary = useMemo(() => {
     const totalGiven = udhpiEntries.filter(e => e.type === 'given').reduce((s, e) => s + e.amount, 0);
     const totalTaken = udhpiEntries.filter(e => e.type === 'taken').reduce((s, e) => s + e.amount, 0);
@@ -39,12 +37,9 @@ export default function Udhari() {
       totalTaken,
       pendingGiven: totalGiven - settledGiven,
       pendingTaken: totalTaken - settledTaken,
-      settledGiven,
-      settledTaken,
     };
   }, [udhpiEntries]);
 
-  // Group by contact
   const contacts = useMemo(() => {
     const map = new Map<string, UdhariEntry[]>();
     udhpiEntries
@@ -63,7 +58,7 @@ export default function Udhari() {
 
   const handleSubmit = () => {
     if (!form.contactName || !form.amount || Number(form.amount) <= 0) {
-      toast.error('Contact name aur amount daalo');
+      toast.error('Please enter contact name and amount');
       return;
     }
     addUdhari({
@@ -74,14 +69,14 @@ export default function Udhari() {
       description: form.description.trim(),
       date: form.date,
     });
-    toast.success('Udhari add ho gayi!');
+    toast.success('Entry added successfully!');
     setForm({ contactName: '', phone: '', amount: '', type: 'given', description: '', date: new Date().toISOString().split('T')[0] });
     setDialogOpen(false);
   };
 
   const handleSettle = (id: string) => {
     settleUdhari(id);
-    toast.success('Paisa settled! ✅');
+    toast.success('Marked as settled! ✅');
   };
 
   return (
@@ -89,16 +84,16 @@ export default function Udhari() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">उधारी / Udhari</h1>
-          <p className="text-sm text-muted-foreground">Lena-Dena ka hisaab</p>
+          <h1 className="text-2xl font-bold text-foreground">Udhari</h1>
+          <p className="text-sm text-muted-foreground">Track lending & borrowing</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="gap-2"><Plus className="w-4 h-4" /> Naya Entry</Button>
+            <Button className="gap-2"><Plus className="w-4 h-4" /> New Entry</Button>
           </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Nayi Udhari Add Karo</DialogTitle>
+              <DialogTitle>Add New Entry</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 pt-2">
               <div className="grid grid-cols-2 gap-3">
@@ -108,7 +103,7 @@ export default function Udhari() {
                   className="gap-2"
                   onClick={() => setForm(f => ({ ...f, type: 'given' }))}
                 >
-                  <ArrowUpCircle className="w-4 h-4" /> Maine Diya
+                  <ArrowUpCircle className="w-4 h-4" /> I Gave
                 </Button>
                 <Button
                   type="button"
@@ -116,12 +111,12 @@ export default function Udhari() {
                   className="gap-2"
                   onClick={() => setForm(f => ({ ...f, type: 'taken' }))}
                 >
-                  <ArrowDownCircle className="w-4 h-4" /> Maine Liya
+                  <ArrowDownCircle className="w-4 h-4" /> I Took
                 </Button>
               </div>
               <div>
                 <Label>Contact Name *</Label>
-                <Input placeholder="Naam likho" value={form.contactName} onChange={e => setForm(f => ({ ...f, contactName: e.target.value }))} />
+                <Input placeholder="Enter name" value={form.contactName} onChange={e => setForm(f => ({ ...f, contactName: e.target.value }))} />
               </div>
               <div>
                 <Label>Phone (optional)</Label>
@@ -133,13 +128,13 @@ export default function Udhari() {
               </div>
               <div>
                 <Label>Description</Label>
-                <Textarea placeholder="Kis cheez ke liye..." value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+                <Textarea placeholder="What is this for..." value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
               </div>
               <div>
                 <Label>Date</Label>
                 <Input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
               </div>
-              <Button className="w-full" onClick={handleSubmit}>Add Udhari</Button>
+              <Button className="w-full" onClick={handleSubmit}>Add Entry</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -149,25 +144,25 @@ export default function Udhari() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card className="border-l-4 border-l-destructive">
           <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Total Diya</p>
+            <p className="text-xs text-muted-foreground">Total Given</p>
             <p className="text-xl font-bold text-destructive">₹{summary.totalGiven.toLocaleString()}</p>
           </CardContent>
         </Card>
         <Card className="border-l-4 border-l-green-500">
           <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Total Liya</p>
+            <p className="text-xs text-muted-foreground">Total Taken</p>
             <p className="text-xl font-bold text-green-600">₹{summary.totalTaken.toLocaleString()}</p>
           </CardContent>
         </Card>
         <Card className="border-l-4 border-l-orange-500">
           <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Lena Baaki</p>
+            <p className="text-xs text-muted-foreground">Pending to Receive</p>
             <p className="text-xl font-bold text-orange-600">₹{summary.pendingGiven.toLocaleString()}</p>
           </CardContent>
         </Card>
         <Card className="border-l-4 border-l-blue-500">
           <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Dena Baaki</p>
+            <p className="text-xs text-muted-foreground">Pending to Pay</p>
             <p className="text-xl font-bold text-blue-600">₹{summary.pendingTaken.toLocaleString()}</p>
           </CardContent>
         </Card>
@@ -177,16 +172,16 @@ export default function Udhari() {
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Contact search karo..." className="pl-9" value={search} onChange={e => setSearch(e.target.value)} />
+          <Input placeholder="Search contacts..." className="pl-9" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <Select value={filterType} onValueChange={(v: any) => setFilterType(v)}>
           <SelectTrigger className="w-[150px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Sab</SelectItem>
-            <SelectItem value="given">Maine Diya</SelectItem>
-            <SelectItem value="taken">Maine Liya</SelectItem>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="given">I Gave</SelectItem>
+            <SelectItem value="taken">I Took</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -196,14 +191,12 @@ export default function Udhari() {
         <Card>
           <CardContent className="p-12 text-center text-muted-foreground">
             <IndianRupee className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p className="text-lg font-medium">Koi udhari nahi hai</p>
-            <p className="text-sm">Upar "Naya Entry" button se add karo</p>
+            <p className="text-lg font-medium">No entries yet</p>
+            <p className="text-sm">Click "New Entry" above to add one</p>
           </CardContent>
         </Card>
       ) : (
         Array.from(contacts.entries()).map(([name, entries]) => {
-          const contactGiven = entries.filter(e => e.type === 'given').reduce((s, e) => s + e.amount, 0);
-          const contactTaken = entries.filter(e => e.type === 'taken').reduce((s, e) => s + e.amount, 0);
           const contactPendingGiven = entries.filter(e => e.type === 'given' && !e.settled).reduce((s, e) => s + e.amount, 0);
           const contactPendingTaken = entries.filter(e => e.type === 'taken' && !e.settled).reduce((s, e) => s + e.amount, 0);
 
@@ -221,8 +214,8 @@ export default function Udhari() {
                     </div>
                   </div>
                   <div className="text-right text-sm">
-                    {contactPendingGiven > 0 && <p className="text-destructive font-semibold">Lena: ₹{contactPendingGiven.toLocaleString()}</p>}
-                    {contactPendingTaken > 0 && <p className="text-blue-600 font-semibold">Dena: ₹{contactPendingTaken.toLocaleString()}</p>}
+                    {contactPendingGiven > 0 && <p className="text-destructive font-semibold">To Receive: ₹{contactPendingGiven.toLocaleString()}</p>}
+                    {contactPendingTaken > 0 && <p className="text-blue-600 font-semibold">To Pay: ₹{contactPendingTaken.toLocaleString()}</p>}
                   </div>
                 </div>
               </CardHeader>
@@ -239,7 +232,7 @@ export default function Udhari() {
                       )}
                       <div>
                         <p className="text-sm font-medium">
-                          {entry.type === 'given' ? 'Diya' : 'Liya'} — ₹{entry.amount.toLocaleString()}
+                          {entry.type === 'given' ? 'Given' : 'Taken'} — ₹{entry.amount.toLocaleString()}
                         </p>
                         {entry.description && <p className="text-xs text-muted-foreground">{entry.description}</p>}
                         <p className="text-xs text-muted-foreground">{format(new Date(entry.date), 'dd MMM yyyy')}</p>
