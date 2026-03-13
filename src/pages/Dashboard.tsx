@@ -23,6 +23,9 @@ const Dashboard = () => {
   const { profile, user } = useAuth();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [incomes, setIncomes] = useState<Income[]>([]);
+  const [importantNotifs, setImportantNotifs] = useState<any[]>([]);
+  const [showImportant, setShowImportant] = useState(false);
+  const [currentImportantIdx, setCurrentImportantIdx] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -35,7 +38,38 @@ const Dashboard = () => {
       setIncomes(incRes.data || []);
     };
     fetchData();
+
+    // Fetch unread important notifications
+    const fetchImportant = async () => {
+      const { data: unreadNotifs } = await supabase
+        .from('user_notifications')
+        .select('id, notification_id, notifications!inner(title, message, is_important)')
+        .eq('user_id', user.id)
+        .eq('read', false);
+      
+      if (unreadNotifs) {
+        const important = unreadNotifs.filter((n: any) => n.notifications?.is_important === true);
+        if (important.length > 0) {
+          setImportantNotifs(important);
+          setCurrentImportantIdx(0);
+          setShowImportant(true);
+        }
+      }
+    };
+    fetchImportant();
   }, [user]);
+
+  const handleDismissImportant = async () => {
+    const current = importantNotifs[currentImportantIdx];
+    if (current) {
+      await supabase.from('user_notifications').update({ read: true }).eq('id', current.id);
+    }
+    if (currentImportantIdx < importantNotifs.length - 1) {
+      setCurrentImportantIdx(prev => prev + 1);
+    } else {
+      setShowImportant(false);
+    }
+  };
 
   const stats = useMemo(() => {
     const now = new Date();
