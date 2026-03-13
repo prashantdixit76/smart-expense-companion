@@ -49,6 +49,17 @@ const SystemActivity = () => {
     }
   };
 
+  const handleDeleteOne = async (id: string) => {
+    try {
+      const { error } = await supabase.from('system_logs').delete().eq('id', id);
+      if (error) throw error;
+      setLogs(prev => prev.filter(l => l.id !== id));
+      toast.success('Log deleted');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete');
+    }
+  };
+
   const filtered = logs.filter(l =>
     !search || l.action.toLowerCase().includes(search.toLowerCase()) || (l.details || '').toLowerCase().includes(search.toLowerCase()) || (l.user_name || '').toLowerCase().includes(search.toLowerCase())
   );
