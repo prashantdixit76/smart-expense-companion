@@ -200,6 +200,15 @@ const Profile = () => {
       </Card>
 
       <Button
+        className="w-full gap-2 h-11 rounded-xl shadow-md gradient-primary text-primary-foreground"
+        onClick={handleDownloadAllData}
+        disabled={downloading}
+      >
+        <Download className="w-4 h-4" />
+        {downloading ? 'Downloading...' : 'Download All Data (CSV)'}
+      </Button>
+
+      <Button
         variant="outline"
         className="w-full gap-2 h-11 rounded-xl border-destructive/50 text-destructive hover:bg-destructive/10"
         onClick={handleResetMonth}
