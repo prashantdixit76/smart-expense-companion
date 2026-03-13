@@ -41,6 +41,8 @@ const UserManagement = () => {
   const [editForm, setEditForm] = useState({ fullName: '', email: '', phone: '' });
   const [newPassword, setNewPassword] = useState('');
   const [newRole, setNewRole] = useState<UserRole>('user');
+  const [resetPasswordUser, setResetPasswordUser] = useState<string | null>(null);
+  const [resetPass, setResetPass] = useState('');
 
   const isSuperAdmin = adminUser?.role === 'super_admin';
 
@@ -178,6 +180,9 @@ const UserManagement = () => {
                           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => startEdit(u)} title="Edit">
                             <Pencil className="w-3.5 h-3.5" />
                           </Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setResetPasswordUser(u.id); setResetPass(''); }} title="Reset Password">
+                            <KeyRound className="w-3.5 h-3.5 text-primary" />
+                          </Button>
                           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => {
                             if (u.status === 'disabled') { enableUser(u.id); toast.success('User enabled.'); }
                             else { disableUser(u.id); toast.info('User disabled.'); }
@@ -254,6 +259,34 @@ const UserManagement = () => {
               <Button className="w-full" onClick={saveEdit}>Save Changes</Button>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+      {/* Reset Password Dialog */}
+      <Dialog open={!!resetPasswordUser} onOpenChange={() => setResetPasswordUser(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle className="flex items-center gap-2"><KeyRound className="w-4 h-4" /> Reset User Password</DialogTitle></DialogHeader>
+          {(() => {
+            const rpUser = users.find(u => u.id === resetPasswordUser);
+            return rpUser ? (
+              <div className="space-y-4">
+                <div className="p-3 rounded-lg bg-muted/50">
+                  <p className="text-sm font-medium">{rpUser.fullName}</p>
+                  <p className="text-xs text-muted-foreground">{rpUser.email}</p>
+                </div>
+                <div>
+                  <Label>New Password</Label>
+                  <Input type="password" placeholder="Enter new password" value={resetPass} onChange={e => setResetPass(e.target.value)} />
+                </div>
+                <Button className="w-full" onClick={() => {
+                  if (!resetPass || resetPass.length < 4) { toast.error('Password must be at least 4 characters.'); return; }
+                  resetUserPassword(rpUser.id, resetPass);
+                  toast.success(`Password reset for ${rpUser.fullName}`);
+                  setResetPasswordUser(null);
+                  setResetPass('');
+                }}>Reset Password</Button>
+              </div>
+            ) : null;
+          })()}
         </DialogContent>
       </Dialog>
     </div>
