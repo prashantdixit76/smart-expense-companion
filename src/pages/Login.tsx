@@ -1,13 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wallet, LogIn, Phone, MessageCircle, Check, Crown, Sun, Moon } from 'lucide-react';
+import { Wallet, LogIn, Phone, MessageCircle, Check, Crown } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const plans = [
   { id: 'monthly', name: 'Monthly', price: 50, duration: '1 Month', perMonth: 50 },
