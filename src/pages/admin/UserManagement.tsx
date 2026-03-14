@@ -158,6 +158,9 @@ const UserManagement = () => {
                       <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setSelectedUser(u.id)} title="View"><Eye className="w-3.5 h-3.5" /></Button>
                       {isSuperAdmin && (
                         <>
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setResetUser(u); setNewPassword(''); setCopied(false); }} title="Reset Password">
+                            <KeyRound className="w-3.5 h-3.5 text-primary" />
+                          </Button>
                           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => {
                             if (u.status === 'disabled') handleStatusChange(u.user_id, u.id, 'approved');
                             else handleStatusChange(u.user_id, u.id, 'disabled');
