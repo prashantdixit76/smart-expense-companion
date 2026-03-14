@@ -78,9 +78,46 @@ const UserManagement = () => {
   };
 
   const handleDelete = async (u: UserWithRole) => {
+    if (!confirm('Are you sure you want to delete this user?')) return;
     await supabase.from('profiles').delete().eq('id', u.id);
     toast.success('User deleted.');
     fetchUsers();
+  };
+
+  const handleResetPassword = async () => {
+    if (!resetUser || !newPassword) return;
+    if (newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    setResetting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-reset-password', {
+        body: { user_id: resetUser.user_id, new_password: newPassword },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(`Password reset for ${resetUser.full_name}`);
+      setResetUser(null);
+      setNewPassword('');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to reset password');
+    } finally {
+      setResetting(false);
+    }
+  };
+
+  const copyPassword = () => {
+    navigator.clipboard.writeText(newPassword);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const generatePassword = () => {
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#$!';
+    let pwd = '';
+    for (let i = 0; i < 10; i++) pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+    setNewPassword(pwd);
   };
 
   const viewUser = users.find(u => u.id === selectedUser);
