@@ -41,7 +41,10 @@ const UserManagement = () => {
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
-
+  const [resetUser, setResetUser] = useState<UserWithRole | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [resetting, setResetting] = useState(false);
+  const [copied, setCopied] = useState(false);
   const isSuperAdmin = myRole === 'super_admin';
 
   const fetchUsers = async () => {
