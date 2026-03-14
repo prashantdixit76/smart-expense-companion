@@ -199,6 +199,49 @@ const UserManagement = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Reset Password Dialog */}
+      <Dialog open={!!resetUser} onOpenChange={() => { setResetUser(null); setNewPassword(''); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="w-5 h-5 text-primary" />
+              Reset Password
+            </DialogTitle>
+          </DialogHeader>
+          {resetUser && (
+            <div className="space-y-4">
+              <div className="p-3 rounded-lg bg-muted/50">
+                <p className="text-sm font-medium">{resetUser.full_name}</p>
+                <p className="text-xs text-muted-foreground">{resetUser.email}</p>
+              </div>
+              <div className="space-y-2">
+                <Label>New Password</Label>
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    value={newPassword}
+                    onChange={e => setNewPassword(e.target.value)}
+                    placeholder="Enter new password"
+                  />
+                  <Button variant="outline" size="icon" className="shrink-0" onClick={copyPassword} title="Copy" disabled={!newPassword}>
+                    {copied ? <Check className="w-4 h-4 text-income" /> : <Copy className="w-4 h-4" />}
+                  </Button>
+                </div>
+                <Button variant="outline" size="sm" className="w-full" onClick={generatePassword}>
+                  Generate Random Password
+                </Button>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => { setResetUser(null); setNewPassword(''); }}>Cancel</Button>
+                <Button onClick={handleResetPassword} disabled={resetting || !newPassword}>
+                  {resetting ? 'Resetting...' : 'Reset Password'}
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
