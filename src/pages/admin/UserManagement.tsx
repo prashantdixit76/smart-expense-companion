@@ -7,9 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Eye, Pencil, Ban, Trash2, KeyRound, Power } from 'lucide-react';
+import { Search, Eye, Ban, Trash2, KeyRound, Power, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, parseISO } from 'date-fns';
 
@@ -41,7 +41,10 @@ const UserManagement = () => {
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
-
+  const [resetUser, setResetUser] = useState<UserWithRole | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [resetting, setResetting] = useState(false);
+  const [copied, setCopied] = useState(false);
   const isSuperAdmin = myRole === 'super_admin';
 
   const fetchUsers = async () => {
@@ -75,9 +78,46 @@ const UserManagement = () => {
   };
 
   const handleDelete = async (u: UserWithRole) => {
+    if (!confirm('Are you sure you want to delete this user?')) return;
     await supabase.from('profiles').delete().eq('id', u.id);
     toast.success('User deleted.');
     fetchUsers();
+  };
+
+  const handleResetPassword = async () => {
+    if (!resetUser || !newPassword) return;
+    if (newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    setResetting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-reset-password', {
+        body: { user_id: resetUser.user_id, new_password: newPassword },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(`Password reset for ${resetUser.full_name}`);
+      setResetUser(null);
+      setNewPassword('');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to reset password');
+    } finally {
+      setResetting(false);
+    }
+  };
+
+  const copyPassword = () => {
+    navigator.clipboard.writeText(newPassword);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const generatePassword = () => {
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#$!';
+    let pwd = '';
+    for (let i = 0; i < 10; i++) pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+    setNewPassword(pwd);
   };
 
   const viewUser = users.find(u => u.id === selectedUser);
@@ -118,6 +158,9 @@ const UserManagement = () => {
                       <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setSelectedUser(u.id)} title="View"><Eye className="w-3.5 h-3.5" /></Button>
                       {isSuperAdmin && (
                         <>
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setResetUser(u); setNewPassword(''); setCopied(false); }} title="Reset Password">
+                            <KeyRound className="w-3.5 h-3.5 text-primary" />
+                          </Button>
                           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => {
                             if (u.status === 'disabled') handleStatusChange(u.user_id, u.id, 'approved');
                             else handleStatusChange(u.user_id, u.id, 'disabled');
@@ -152,6 +195,49 @@ const UserManagement = () => {
                 <div><p className="text-muted-foreground text-xs">Created</p><p>{(() => { try { return format(parseISO(viewUser.created_at), 'dd MMM yyyy'); } catch { return 'N/A'; } })()}</p></div>
                 <div><p className="text-muted-foreground text-xs">Last Login</p><p>{viewUser.last_login ? format(parseISO(viewUser.last_login), 'dd MMM yyyy HH:mm') : 'Never'}</p></div>
               </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Reset Password Dialog */}
+      <Dialog open={!!resetUser} onOpenChange={() => { setResetUser(null); setNewPassword(''); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="w-5 h-5 text-primary" />
+              Reset Password
+            </DialogTitle>
+          </DialogHeader>
+          {resetUser && (
+            <div className="space-y-4">
+              <div className="p-3 rounded-lg bg-muted/50">
+                <p className="text-sm font-medium">{resetUser.full_name}</p>
+                <p className="text-xs text-muted-foreground">{resetUser.email}</p>
+              </div>
+              <div className="space-y-2">
+                <Label>New Password</Label>
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    value={newPassword}
+                    onChange={e => setNewPassword(e.target.value)}
+                    placeholder="Enter new password"
+                  />
+                  <Button variant="outline" size="icon" className="shrink-0" onClick={copyPassword} title="Copy" disabled={!newPassword}>
+                    {copied ? <Check className="w-4 h-4 text-income" /> : <Copy className="w-4 h-4" />}
+                  </Button>
+                </div>
+                <Button variant="outline" size="sm" className="w-full" onClick={generatePassword}>
+                  Generate Random Password
+                </Button>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => { setResetUser(null); setNewPassword(''); }}>Cancel</Button>
+                <Button onClick={handleResetPassword} disabled={resetting || !newPassword}>
+                  {resetting ? 'Resetting...' : 'Reset Password'}
+                </Button>
+              </DialogFooter>
             </div>
           )}
         </DialogContent>
